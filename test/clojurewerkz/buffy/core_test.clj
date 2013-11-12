@@ -174,15 +174,14 @@
     (set-field b :second-field [100 "abcdef"])
     (is (= [100 "abcdef"] (get-field b :second-field)))))
 
-(deftest repeated-field-write-test
+(deftest complete-access-test
   (let [spec {:first-field (int32-type)
-              :second-field (repeated-type (int32-type) 10)}
+              :second-field (string-type 10)
+              :third-field (boolean-type)}
         b    (compose-buffer spec)]
-    (set-field b :second-field [1 2 3 4 5 6 7 8 9 10])
-    (is (= [1 2 3 4 5 6 7 8 9 10] (get-field b :second-field)))
 
-
-    (set-field b :second-field [5 6 7 8 9])
-
-    (def testbuf b)
-    (is (= [5 6 7 8 9 0 0 0 0 0] (get-field b :second-field)))))
+    (set-fields b {:first-field 101
+                   :second-field "string"
+                   :third-field true})
+    (is (= {:third-field true :second-field "string" :first-field 101}
+           (decompose b)))))

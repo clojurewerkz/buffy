@@ -3,10 +3,17 @@
   (:use clojurewerkz.buffy.types.protocols)
   (:require [clojurewerkz.buffy.types :as t]
             [clojurewerkz.buffy.util :refer :all])
-  (:import [io.netty.buffer UnpooledByteBufAllocator ByteBufAllocator]
-   ))
+  (:import [io.netty.buffer UnpooledByteBufAllocator ByteBufAllocator]))
 
 (def ^ByteBufAllocator allocator UnpooledByteBufAllocator/DEFAULT)
+
+(defn heap-buffer
+  ([]
+     (.heapBuffer allocator))
+  ([^long initial-capacity]
+     (.heapBuffer allocator initial-capacity initial-capacity))
+  ([^long initial-capacity ^long max-capacity]
+     (.heapBuffer allocator initial-capacity max-capacity)))
 
 (defn direct-buffer
   ([]
@@ -16,11 +23,11 @@
   ([^long initial-capacity ^long max-capacity]
      (.directBuffer allocator initial-capacity max-capacity)))
 
-
-
 (defprotocol IBuffyBuf
   (buffer [this])
   (slices [this])
+  (decompose [this])
+  (set-fields [this kvps])
 
   (get-field [this field-name])
   (get-field-idx [this field-idx])
@@ -31,6 +38,10 @@
 (deftype BuffyBuf [buf indexes types positions]
   IBuffyBuf
   (buffer [b] buf)
+
+  (set-fields [this kvps]
+    (doseq [[k v] kvps]
+      (set-field this k v)))
 
   (set-field [b field-name value]
     (let [idx (get (.indexes b) field-name)]
@@ -46,19 +57,23 @@
             (.buf b)
             (nth (.positions b) idx))))
 
-  )
+  (decompose [b]
+    (into {}
+          (for [[field _] indexes]
+            [field (.get-field b field)]))))
 
 (defn compose-buffer
-  [spec]
+  [spec & {:keys [buffer-type] :or {buffer-type :direct}}]
   (let [indexes    (zipmap (map first spec)
                            (iterate inc 0))
         types      (map second spec)
         total-size (reduce + (map size types))
-        buffer     (direct-buffer total-size)
+        buffer     (cond
+                    (= buffer-type :heap)   (heap-buffer total-size)
+                    (= buffer-type :direct) (direct-buffer total-size)
+                    :else                   (heap-buffer total-size))
         positions  (positions types)]
     (BuffyBuf. buffer indexes types positions)))
-
-
 
 (def int32-type   t/int32-type)
 (def boolean-type t/boolean-type)
