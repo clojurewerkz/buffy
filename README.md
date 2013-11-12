@@ -14,6 +14,8 @@ everything you would usually do `ByteBuffer`.
 
 ### The Most Recent Release
 
+Latest artifacts are pushed to [Clojars](https://clojars.org/clojurewerkz/buffy)
+
 With Leiningen:
 
 ```clj
