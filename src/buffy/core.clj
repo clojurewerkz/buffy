@@ -4,19 +4,6 @@
 
 (def ^ByteBufAllocator allocator UnpooledByteBufAllocator/DEFAULT)
 
-(defn positions
-  "Returns a lazy sequence containing positions of elements"
-  [types]
-  ((fn rpositions [[t & more] current-pos]
-     (when t
-       (cons current-pos (lazy-seq (rpositions more (+ current-pos (size t)))))))
-   types 0))
-
-(defn zero-fill-till-end
-  [buffer idx size expected-size]
-  (when (< size expected-size)
-    (.setZero buffer (+ idx size) (- expected-size size))))
-
 (defn direct-buffer
   ([]
      (.directBuffer allocator))
@@ -29,6 +16,19 @@
   (size [bt])
   (write [bt buffer idx value])
   (read [bt buffer idx]))
+
+(defn positions
+  "Returns a lazy sequence containing positions of elements"
+  [types]
+  ((fn rpositions [[t & more] current-pos]
+     (when t
+       (cons current-pos (lazy-seq (rpositions more (+ current-pos (size t)))))))
+   types 0))
+
+(defn zero-fill-till-end
+  [buffer idx size expected-size]
+  (when (< size expected-size)
+    (.setZero buffer (+ idx size) (- expected-size size))))
 
 (deftype Int32Type []
   BuffyType

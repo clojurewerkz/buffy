@@ -1,4 +1,4 @@
-(ns buffy.core-test2
+(ns buffy.core-test
   (:refer-clojure :exclude [read])
   (:require [clojure.test :refer :all]
             [buffy.core :refer :all]
