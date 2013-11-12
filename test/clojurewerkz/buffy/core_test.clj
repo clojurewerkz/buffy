@@ -174,6 +174,22 @@
     (set-field b :second-field [100 "abcdef"])
     (is (= [100 "abcdef"] (get-field b :second-field)))))
 
+(deftest repeated-field-write-test
+  (let [spec {:first-field (int32-type)
+              :second-field (repeated-type (string-type 10) 5)}
+        b    (compose-buffer spec)]
+    (set-field b :second-field ["abcde1" "abcde2" "abcde3" "abcde4" "abcde5"])
+    (is (= ["abcde1" "abcde2" "abcde3" "abcde4" "abcde5"]
+           (get-field b :second-field)))))
+
+(deftest repeated-composite-write-test
+  (let [spec {:first-field (int32-type)
+              :second-field (repeated-type (composite-type (int32-type) (string-type 10)) 5)}
+        b    (compose-buffer spec)]
+    (set-field b :second-field [[1 "abcde1"] [2 "abcde2"] [3 "abcde3"] [4 "abcde4"] [5 "abcde5"]])
+    (is (= [[1 "abcde1"] [2 "abcde2"] [3 "abcde3"] [4 "abcde4"] [5 "abcde5"]]
+           (get-field b :second-field)))))
+
 (deftest complete-access-test
   (let [spec {:first-field (int32-type)
               :second-field (string-type 10)
