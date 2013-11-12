@@ -1,6 +1,8 @@
 (ns clojurewerkz.buffy.core-test
   (:refer-clojure :exclude [read])
+  (:use clojurewerkz.buffy.types.protocols)
   (:require [clojure.test :refer :all]
+            [clojurewerkz.buffy.util :refer :all]
             [clojurewerkz.buffy.core :refer :all]
             [simple-check.core :as sc]
             [simple-check.generators :as gen]
@@ -11,9 +13,6 @@
 (deftest size-test
   (is (= 4 (size (int32-type))))
   (is (= 10 (size (string-type 10)))))
-
-(deftest positions-test
-  (is (= '(0 4 14 18 22) (positions [(int32-type) (string-type 10) (int32-type) (int32-type) (string-type 16)]))))
 
 (deftest int-field-write-test
   (let [spec {:first-field (int32-type)
@@ -184,4 +183,6 @@
 
 
     (set-field b :second-field [5 6 7 8 9])
+
+    (def testbuf b)
     (is (= [5 6 7 8 9 0 0 0 0 0] (get-field b :second-field)))))
