@@ -192,6 +192,14 @@ It will yield something like that:
  +----------+--------------------------------------------------+------------------+
 ```
 
+## Project Maturity
+
+Buffy is __very__ young but, even though we have a very good feeling about API, we can't guarantee it won't change in
+a meantime. We're very open for discussions and suggestions.
+
+## Community
+
+To subscribe for announcements of releases, important changes and so on, please follow [@ClojureWerkz](http://twitter.com/clojurewerkz) on Twitter.
 
 ## Supported Clojure Versions
 
