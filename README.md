@@ -120,7 +120,7 @@ Built-in data types are:
   * `float-type` - 4 bytes long `float`
   * `long-type` - 4 bytes long `long`
 
-## Arbitrary-length types
+### Arbitrary-length types
 
   * `string-type` - arbitrary size `string` (you define length yourself).
 
@@ -140,7 +140,7 @@ contain:
 (bytes-type 25)
 ```
 
-## Complex Types
+### Complex Types
 
   * `composite-type` - composite type, may combine any of the forementioned types
 
