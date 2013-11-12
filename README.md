@@ -10,6 +10,24 @@ Buffer is a Clojure library to work with Binary Data.
   * pretty hexdump
   * many useful default types that you can combine and extend easily
 
+### The Most Recent Release
+
+With Leiningen:
+
+```clj
+[clojurewerkz/buffy "0.1.0-SNAPSHOT"]
+```
+
+With Maven:
+
+```xml
+<dependency>
+  <groupId>clojurewerkz</groupId>
+  <artifactId>buffy</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+</dependency>
+```
+
 ## Usage
 
 Refer Buffy into your project: `clojurewerkz.buffy.core`.
