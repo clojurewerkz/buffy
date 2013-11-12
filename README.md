@@ -17,7 +17,7 @@ everything you would usually do `ByteBuffer`.
 With Leiningen:
 
 ```clj
-[clojurewerkz/buffy "0.1.0-SNAPSHOT"]
+[clojurewerkz/buffy "0.1.0"]
 ```
 
 With Maven:
@@ -26,7 +26,7 @@ With Maven:
 <dependency>
   <groupId>clojurewerkz</groupId>
   <artifactId>buffy</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
 </dependency>
 ```
 
