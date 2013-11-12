@@ -1,4 +1,4 @@
-(ns buffy.core
+(ns clojurewerkz.buffy.core
   (:refer-clojure :exclude [read])
   (:import [io.netty.buffer UnpooledByteBufAllocator ByteBufAllocator]))
 

@@ -1,7 +1,7 @@
-(ns buffy.core-test
+(ns clojurewerkz.buffy.core-test
   (:refer-clojure :exclude [read])
   (:require [clojure.test :refer :all]
-            [buffy.core :refer :all]
+            [clojurewerkz.buffy.core :refer :all]
             [simple-check.core :as sc]
             [simple-check.generators :as gen]
             [simple-check.properties :as prop]))
