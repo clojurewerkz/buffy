@@ -130,9 +130,7 @@
         b    (compose-buffer spec)]
     (is (= true (get-set-generative gen/byte b :first-field)))))
 
-(def gen-float
-  "Generates natural numbers, starting at zero. Shrinks to zero."
-  (gen/fmap (fn [[a b]] (float (+ a (* 0.01 b)))) (gen/vector gen/int 2)))
+(def gen-float (gen/fmap float gen/ratio))
 
 (deftest ^:generative float-field-write-test-generative-test
   (let [spec {:first-field (float-type)
@@ -189,6 +187,31 @@
     (set-field b :second-field [[1 "abcde1"] [2 "abcde2"] [3 "abcde3"] [4 "abcde4"] [5 "abcde5"]])
     (is (= [[1 "abcde1"] [2 "abcde2"] [3 "abcde3"] [4 "abcde4"] [5 "abcde5"]]
            (get-field b :second-field)))))
+
+(deftest enum-field-write-test
+  (let [spec {:first-field (int32-type)
+              :second-field (enum-type (long-type) {:STARTUP 0x02 :QUERY 0x07})}
+        b    (compose-buffer spec)]
+    (set-field b :second-field :STARTUP)
+    (is (= :STARTUP
+           (get-field b :second-field)))
+    (set-field b :second-field :QUERY)
+    (is (= :QUERY
+           (get-field b :second-field)))))
+
+(deftest enum-field-write-test
+  (let [spec {:first-field (int32-type)
+              :second-field (enum-type (repeated-type (composite-type (int32-type) (string-type 10)) 5)
+                                       {:FIRST [[1 "abcde1"] [2 "abcde2"] [3 "abcde3"] [4 "abcde4"] [5 "abcde5"]]
+                                        :SECOND [[6 "abcde6"] [7 "abcde7"] [8 "abcde8"] [9 "abcde9"] [10 "abcde10"]]})}
+        b    (compose-buffer spec)]
+    (set-field b :second-field :FIRST)
+    (is (= :FIRST
+           (get-field b :second-field)))
+    (set-field b :second-field :SECOND)
+    (is (= :SECOND
+           (get-field b :second-field)))))
+
 
 (deftest complete-access-test
   (let [spec {:first-field (int32-type)

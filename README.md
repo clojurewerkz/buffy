@@ -173,6 +173,33 @@ You can also do tricks like `repeated-composite-type`:
 
 Which will construct a type consisting of `int`/`string` chunks repeated 5 times.
 
+  * `enum-type` - is a mapping between some human-readable values and their internal binary representation.
+
+Consider some Binary Protocol, where `STARTUP` verb, that makes server aware of the message type, startup,
+represents a long value of `0x01` and `QUERY` verb, that makes server aware, that message contains a query,
+is `0x07`.
+
+This is a common pattern in Binary Protocols, but it's hard to keep all the constants in mind, therefore
+it's easier to keep their human-readable representations. For that, you can use `enum-type`:
+
+```clj
+(enum-type (long-type) {:STARTUP 0x02 :QUERY 0x07})
+```
+
+Now, you can set your field using `:STARTUP` and `:QUERY` symbols:
+
+```clj
+(set-field buffer :payload-type :STARTUP)
+```
+
+When reading the field (let's say, payload contained binary `0x07`, you'll get it's mapping (`:QUERY`) in
+return:
+
+```clj
+(get-field buffer :payload-type)
+;; => :QUERY
+```
+
 ## Hex Dump
 
 You can also hex-dump buffers created with Buffy by using `clojurewerkz.buffy.util/hex-dump`.

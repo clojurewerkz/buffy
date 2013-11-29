@@ -59,7 +59,7 @@
 
 (deftype LongType []
   BuffyType
-  (size [_] 4)
+  (size [_] 8)
   (write [bt buffer idx value]
     (.setLong buffer idx value))
   (read [by buffer idx]
@@ -88,6 +88,15 @@
 ;;
 ;; Comples types
 ;;
+
+(deftype EnumType [item-type mappings reverse-mappings]
+  BuffyType
+  (size [_] (size item-type))
+  (write [bt buffer idx value]
+    (.write item-type buffer idx (get mappings value)))
+  (read [bt buffer idx]
+    (let [intermediate (.read item-type buffer idx)]
+      (get reverse-mappings intermediate))))
 
 (deftype CompositeType [types]
   BuffyType
@@ -138,3 +147,8 @@
 (defn repeated-type
   [type times]
   (RepeatedType. type times))
+
+(defn enum-type
+  [type mappings]
+  (let [reverse-mappings (zipmap (vals mappings) (keys mappings))]
+    (EnumType. type mappings reverse-mappings)))
