@@ -7,21 +7,26 @@
 
 (def ^ByteBufAllocator allocator UnpooledByteBufAllocator/DEFAULT)
 
+(defn- set-writer-index
+  [buf]
+  (.writerIndex buf (.capacity buf))
+  buf)
+
 (defn heap-buffer
   ([]
-     (.heapBuffer allocator))
+     (set-writer-index (.heapBuffer allocator)))
   ([^long initial-capacity]
-     (.heapBuffer allocator initial-capacity initial-capacity))
+     (set-writer-index (.heapBuffer allocator initial-capacity initial-capacity)))
   ([^long initial-capacity ^long max-capacity]
-     (.heapBuffer allocator initial-capacity max-capacity)))
+     (set-writer-index (.heapBuffer allocator initial-capacity max-capacity))))
 
 (defn direct-buffer
   ([]
-     (.directBuffer allocator))
+     (set-writer-index (.directBuffer allocator)))
   ([^long initial-capacity]
-     (.directBuffer allocator initial-capacity initial-capacity))
+     (set-writer-index (.directBuffer allocator initial-capacity initial-capacity)))
   ([^long initial-capacity ^long max-capacity]
-     (.directBuffer allocator initial-capacity max-capacity)))
+     (set-writer-index (.directBuffer allocator initial-capacity max-capacity))))
 
 (defprotocol IBuffyBuf
   (buffer [this])
@@ -87,3 +92,4 @@
 (def bytes-type   t/bytes-type)
 (def composite-type t/composite-type)
 (def repeated-type  t/repeated-type)
+(def enum-type  t/enum-type)
