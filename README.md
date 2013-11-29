@@ -19,7 +19,7 @@ Latest artifacts are pushed to [Clojars](https://clojars.org/clojurewerkz/buffy)
 With Leiningen:
 
 ```clj
-[clojurewerkz/buffy "0.2.0"]
+[clojurewerkz/buffy "0.3.0"]
 ```
 
 With Maven:
@@ -28,7 +28,7 @@ With Maven:
 <dependency>
   <groupId>clojurewerkz</groupId>
   <artifactId>buffy</artifactId>
-  <version>0.2.0</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 
