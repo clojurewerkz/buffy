@@ -49,16 +49,23 @@ With Maven:
 
 ## Usage
 
-Refer Buffy into your project: `clojurewerkz.buffy.core`.
-Buffy creates all buffers based on a spec you specify. Spec consists of one or many data types,
-for example:
+Require Buffy's main namespace:
+
+``` clojure
+(ns my.app
+  (:require [clojurewerkz.buffy.core :refer :all]))
+```
+
+Buffy creates buffers from a spec you specify. The spec consists of
+one or more fields of known data types, for example:
 
 ```clj
 {:my-field-1 (int32-type)
  :my-field-2 (string-type 10)}
 ```
 
-Is a specification for a buffer containing 2 fields, one 4 bytes long and second one 14:
+Below is a specification for a buffer containing 2 fields, one 4 bytes
+long and second one 14:
 
 ```
 0            4                         14
@@ -68,14 +75,17 @@ Is a specification for a buffer containing 2 fields, one 4 bytes long and second
 +------------+-------------------------+
 ```
 
-Now, you can use this specification to create a byte buffer:
+Now you can use this specification to create a byte buffer:
 
 ```clj
 (compose-buffer {:my-field-1 (int32-type) :my-field-2 (string-type 10)}
+;= a byte buffer
 ```
 
-Keys (`:my-field-1`, `:my-field-2`) aren't a part of byte buffer. They're stored _only_ in a spec.
-If you're transferring a byte buffer over a network, receiving part should implement it's own parsing.
+Note that they keys (`:my-field-1`, `:my-field-2`) are not part of the
+byte buffer (not serialized in the data). If you're transferring a
+byte buffer over a network, the receiving end should be able to
+deserialize it.
 
 ### Accessing parts of payload
 
