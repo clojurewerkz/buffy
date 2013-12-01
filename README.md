@@ -1,4 +1,4 @@
-# Buffy, the byte buffer slayer
+# Buffy, The Byte Buffer Slayer
 
 Buffy is a Clojure library for working with binary data, writing
 complete binary protocol implementations in Clojure, storing complex
