@@ -167,36 +167,38 @@ contain:
 (bytes-type 25)
 ```
 
-### Complex Types
+### Complex (Composite) Types
 
-  * `composite-type` - composite type, may combine any of the forementioned types
+Composite types combine multiple primitive types.
 
-`CompositeType` is kind of a sub-buffer. In a byte representation, we do not add any paddings or
-offsets, just writing all parts sequentially. It's mostly created for your convenience:
+`composite-type` produces a slice of a buffer. In the byte representation, no
+paddings or offsets are added. All parts are written to the buffer
+sequentially:
 
-Here's what composite type consisting of `int` and 10 characters long `string` would look like:
+Here's what composite type consisting of `int` and 10 characters long
+`string` would look like:
 
 ```clj
 (composite-type (int32-type) (string-type 10))
 ```
 
-  * `repeated-type` - repeats any type given amount of times
-
-`RepeatedType` is used when you need to have many fields of same size:
+`repeated-type` repeats a type one or more times.  Repeated types is
+used when you need to have many fields of same size:
 
 ```clj
 (repeated-type (string-type 10) 5)
 ```
 
-Will make a type consisting of 5 `strings` of length 10.
+will produce a type consisting of 5 `strings` of length 10.
 
-You can also do tricks like `repeated-composite-type`:
+It's possible to combine `repeated-type` and `composite-type`:
 
 ```clj
 (repeated-type (composite-type (int32-type) (string-type 10)) 5)
 ```
 
-Which will construct a type consisting of `int`/`string` chunks repeated 5 times.
+Which will construct a type consisting of `int`/`string` chunks
+repeated 5 times.
 
   * `enum-type` - is a mapping between some human-readable values and their internal binary representation.
 
