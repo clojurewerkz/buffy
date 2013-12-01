@@ -264,7 +264,7 @@ Buffy requires Clojure 1.4+.
 
 ## Buffy Is a ClojureWerkz Project
 
-Machine Head is part of the [group of Clojure libraries known as ClojureWerkz](http://clojurewerkz.org), together with
+Buffy is part of the [group of Clojure libraries known as ClojureWerkz](http://clojurewerkz.org), together with
 
  * [Monger](http://clojuremongodb.info)
  * [Langohr](http://clojurerabbitmq.info)
@@ -279,7 +279,7 @@ and several others.
 
 ## Development
 
-Machine Head uses [Leiningen 2](http://leiningen.org). Make sure you
+Buffy uses [Leiningen 2](http://leiningen.org). Make sure you
 have it installed and then run tests against supported Clojure
 versions using
 
