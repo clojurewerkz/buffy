@@ -140,20 +140,19 @@ Built-in data types are:
 
 ### Primitive types
 
-  * `int32-type` - 4 bytes long `int`
-  * `boolean-type` - 1 byte long `boolean`
-  * `byte-type` - single byte
-  * `short-type` - 2 bytes long `short`
-  * `medium-type` - 3 bytes long `int`
-  * `float-type` - 4 bytes long `float`
-  * `long-type` - 4 bytes long `long`
+  * `int32-type`: 32 bit integer
+  * `boolean-type`: boolean (1 byte) 
+  * `byte-type`: a single byte
+  * `short-type`: 16 bit integer
+  * `medium-type`: 24 bit integer
+  * `float-type`: 32 bit floating point
+  * `long-type`: 64 bit integer
 
 ### Arbitrary-length types
 
   * `string-type` - arbitrary size `string` (you define length yourself).
 
-In order to construct a `StringType`, specify it's length. For example, if you want your
-buffer part to hold string of 15 characters, use:
+In order to construct a `string-type`, specify its length:
 
 ```clj
 (string-type 15)
