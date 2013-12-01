@@ -13,9 +13,23 @@ everything you would usually do with `ByteBuffer`.
   * pretty hexdump
   * many useful default types that you can combine and extend easily
 
-### The Most Recent Release
 
-Latest artifacts are pushed to [Clojars](https://clojars.org/clojurewerkz/buffy)
+## Installation
+
+### Artefacts
+
+Latest artifacts are published to
+[Clojars](https://clojars.org/clojurewerkz/buffy) If you are using
+Maven, add the following repository definition to your `pom.xml`:
+
+``` xml
+<repository>
+  <id>clojars.org</id>
+  <url>http://clojars.org/repo</url>
+</repository>
+```
+
+### The Most Recent Release
 
 With Leiningen:
 
