@@ -14,6 +14,12 @@ everything you would usually do with `ByteBuffer`.
   * many useful default types that you can combine and extend easily
 
 
+## Project Maturity
+
+Buffy is __very__ young. Breaking API changes are not out of the
+question before 1.0 release.
+
+
 ## Installation
 
 ### Artefacts
@@ -200,27 +206,24 @@ It's possible to combine `repeated-type` and `composite-type`:
 Which will construct a type consisting of `int`/`string` chunks
 repeated 5 times.
 
-  * `enum-type` - is a mapping between some human-readable values and their internal binary representation.
+ `enum-type` produces a mapping between human-readable values and
+ their internal binary representation.
 
-Consider some Binary Protocol, where `STARTUP` verb, that makes server aware of the message type, startup,
-represents a long value of `0x01` and `QUERY` verb, that makes server aware, that message contains a query,
-is `0x07`.
-
-This is a common pattern in Binary Protocols, but it's hard to keep all the constants in mind, therefore
-it's easier to keep their human-readable representations. For that, you can use `enum-type`:
+Consider a binary protocol where the `STARTUP` verb is encoded as a
+long value of `0x01` and the `QUERY` verb is encoded as `0x07`:
 
 ```clj
 (enum-type (long-type) {:STARTUP 0x02 :QUERY 0x07})
 ```
 
-Now, you can set your field using `:STARTUP` and `:QUERY` symbols:
+With this enum type, it is possible to set a field using `:STARTUP`
+and `:QUERY` keywords:
 
 ```clj
 (set-field buffer :payload-type :STARTUP)
 ```
 
-When reading the field (let's say, payload contained binary `0x07`, you'll get it's mapping (`:QUERY`) in
-return:
+When reading a field, its symbolic representation is returned:
 
 ```clj
 (get-field buffer :payload-type)
@@ -229,9 +232,9 @@ return:
 
 ## Hex Dump
 
-You can also hex-dump buffers created with Buffy by using `clojurewerkz.buffy.util/hex-dump`.
-
-It will yield something like that:
+It is possible to produce a hex-dump of a buffer created with Buffy
+using `clojurewerkz.buffy.util/hex-dump`. It will produce the
+following representation:
 
 ```
             +--------------------------------------------------+
@@ -250,10 +253,6 @@ It will yield something like that:
  +----------+--------------------------------------------------+------------------+
 ```
 
-## Project Maturity
-
-Buffy is __very__ young but, even though we have a very good feeling about API, we can't guarantee it won't change in
-a meantime. We're very open for discussions and suggestions.
 
 ## Community
 
