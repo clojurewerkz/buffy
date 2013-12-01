@@ -87,11 +87,12 @@ byte buffer (not serialized in the data). If you're transferring a
 byte buffer over a network, the receiving end should be able to
 deserialize it.
 
-### Accessing parts of payload
+### Accessing Fields In The Payload
 
-You can use `get-field` and `set-field` to access particular fields of the payload.
+Use `get-field` and `set-field` to access individual fields of the
+payload.
 
-Let's check out a complete example:
+Here's an example:
 
 ```clj
 (ns my-binary-project.core
