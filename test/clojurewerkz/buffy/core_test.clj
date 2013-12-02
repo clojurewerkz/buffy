@@ -1,9 +1,9 @@
 (ns clojurewerkz.buffy.core-test
   (:refer-clojure :exclude [read])
-  (:use clojurewerkz.buffy.types.protocols)
   (:require [clojure.test :refer :all]
             [clojurewerkz.buffy.util :refer :all]
             [clojurewerkz.buffy.core :refer :all]
+            [clojurewerkz.buffy.types.protocols :refer :all]
             [simple-check.core :as sc]
             [simple-check.generators :as gen]
             [simple-check.properties :as prop]))
