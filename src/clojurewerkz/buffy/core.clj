@@ -1,8 +1,8 @@
 (ns clojurewerkz.buffy.core
   (:refer-clojure :exclude [read])
-  (:use clojurewerkz.buffy.types.protocols)
   (:require [clojurewerkz.buffy.types :as t]
-            [clojurewerkz.buffy.util :refer :all])
+            [clojurewerkz.buffy.util :refer :all]
+            [clojurewerkz.buffy.types.protocols :refer :all])
   (:import [io.netty.buffer UnpooledByteBufAllocator ByteBufAllocator]))
 
 (def ^ByteBufAllocator allocator UnpooledByteBufAllocator/DEFAULT)

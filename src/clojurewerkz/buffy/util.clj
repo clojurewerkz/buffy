@@ -1,6 +1,6 @@
 (ns clojurewerkz.buffy.util
   (:refer-clojure :exclude [read])
-  (:use clojurewerkz.buffy.types.protocols)
+  (:require [clojurewerkz.buffy.types.protocols :refer :all])
   (:import [io.netty.buffer ByteBufUtil]))
 
 (defn positions
