@@ -1,4 +1,5 @@
-(ns clojurewerkz.buffy.types.protocols)
+(ns clojurewerkz.buffy.types.protocols
+  (:refer-clojure :exclude [read]))
 
 ;;
 ;; Protocol
