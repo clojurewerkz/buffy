@@ -70,6 +70,9 @@ one or more fields of known data types, for example:
       :my-field-2 (string-type 10))
 ```
 
+Spec is taken as any type of key-value pairs (for example, vector of vectors or
+array-map). Avoid using hashmaps, since their order is not predictable.
+
 Below is a specification for a buffer containing 2 fields, one 4 bytes
 long and second one 14:
 
