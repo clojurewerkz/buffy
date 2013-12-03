@@ -49,23 +49,34 @@
       (set-field this k v)))
 
   (set-field [b field-name value]
-    (let [idx (get (.indexes b) field-name)]
-      (write (nth (.types b) idx)
+    (let [idx      (get (.indexes b) field-name)
+          _        (assert idx (format "Index for field `%s` is `%s`, please verify that field name matches mappings" field-name idx))
+          type     (nth (.types b) idx)
+          position (nth (.positions b) idx)]
+
+      (write type
              (.buf b)
-             (nth (.positions b) idx)
+             position
              value))
     b)
 
   (get-field [b field-name]
-    (let [idx (get (.indexes b) field-name)]
-      (read (nth (.types b) idx)
+    (let [idx      (get (.indexes b) field-name)
+          _        (assert idx (format "Index for field `%s` is `%s`, please verify that field name matches mappings" field-name idx))
+          type     (nth (.types b) idx)
+          position (nth (.positions b) idx)]
+      (read type
             (.buf b)
-            (nth (.positions b) idx))))
+            position)))
 
   (decompose [b]
     (into {}
           (for [[field _] indexes]
             [field (.get-field b field)]))))
+
+(defn spec
+  [& kvps]
+  (partition 2 kvps))
 
 (defn compose-buffer
   [spec & {:keys [buffer-type] :or {buffer-type :direct}}]
