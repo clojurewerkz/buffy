@@ -66,8 +66,8 @@ Buffy creates buffers from a spec you specify. The spec consists of
 one or more fields of known data types, for example:
 
 ```clj
-{:my-field-1 (int32-type)
- :my-field-2 (string-type 10)}
+(spec :my-field-1 (int32-type)
+      :my-field-2 (string-type 10))
 ```
 
 Below is a specification for a buffer containing 2 fields, one 4 bytes
@@ -84,7 +84,7 @@ long and second one 14:
 Now you can use this specification to create a byte buffer:
 
 ```clj
-(compose-buffer {:my-field-1 (int32-type) :my-field-2 (string-type 10)}
+(compose-buffer (spec :my-field-1 (int32-type) :my-field-2 (string-type 10)))
 ;= a byte buffer
 ```
 
@@ -104,9 +104,9 @@ Here's an example:
 (ns my-binary-project.core
   (:require [clojurewerkz.buffy.core :refer :all]))
 
-(let [spec {:int-field (int32-type)
-            :string-field (string-type 10)}
-      buf  (compose-buffer spec)]
+(let [s    (spec :int-field (int32-type)
+                 :string-field (string-type 10))
+      buf  (compose-buffer s)]
 
   (set-field buf :int-field 101)
   (get-field buf :int-field)
@@ -125,9 +125,9 @@ You can also serialize and deserialize a complete buffer:
 
 ```clj
 
-(let [spec {:first-field (int32-type)
-            :second-field (string-type 10)
-            :third-field (boolean-type)}
+(let [s     (spec :first-field (int32-type)
+                  :second-field (string-type 10)
+                  :third-field (boolean-type))
       buf  (compose-buffer spec)]
 
   (set-fields buf {:first-field 101
@@ -147,7 +147,7 @@ Built-in data types are:
 ### Primitive types
 
   * `int32-type`: 32 bit integer
-  * `boolean-type`: boolean (1 byte) 
+  * `boolean-type`: boolean (1 byte)
   * `byte-type`: a single byte
   * `short-type`: 16 bit integer
   * `medium-type`: 24 bit integer
