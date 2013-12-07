@@ -48,11 +48,11 @@
   (let [s (spec :first-field (byte-type)
                 :second-field (string-type 10))
         b (compose-buffer s)]
-    (set-field b :first-field (byte \0))
-    (is (= (byte \0) (get-field b :first-field)))
+    (set-field b :first-field 0)
+    (is (= 0 (get-field b :first-field)))
 
-    (set-field b :first-field (byte 50))
-    (is (= (byte 50) (get-field b :first-field)))))
+    (set-field b :first-field 50)
+    (is (= 50 (get-field b :first-field)))))
 
 (deftest short-field-write-test
   (let [s (spec :first-field (short-type)
