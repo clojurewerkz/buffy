@@ -120,28 +120,30 @@
       (instance? java.util.Map x)))
 
 (defn bits-on-at
-  "Given a sequence of indexes (0-based), returns a sequence of 32 booleans where indexes
+  "Given a sequence of indexes (0-based), returns a sequence of `n` (divisible by 8) booleans where indexes
    on given positions are set to `true`"
-  [positions]
+  [positions byte-size]
   (assert (seqable? positions) "Positions for `bits-on-at` should be a sequence")
   (mapv (fn [i]
           (some #(= i %) positions))
-        (range 0 32)))
+        (range 0 (* byte-size 8))))
 
 (defn bits-off-at
   "Given a sequence of indexes (0-based), returns a sequence of 32 booleans where indexes
    on given positions are set to `false`"
-  [positions]
+  [positions byte-size]
   (assert (seqable? positions) "Positions for `bits-off-at` should be a sequence")
+
   (mapv (fn [i]
           (not (some #(= i %) positions)))
-        (range 0 32)))
+        (range 0 (* byte-size 8))))
 
 (defn on-bits-indexes
   "Returns indexes of the bits that are 'on'"
   [val]
   (assert (seqable? val) "Value should be sequence")
-  (assert (= (count val) 32) "Value should be 32 bits long")
+  (assert (= (mod (count val) 8) 0) "Value should be `n` bits long, where `n` is divisible by 8")
+
   (reduce (fn [acc [val i]]
             (if val
               (conj acc i)
@@ -153,7 +155,8 @@
   "Returns indexes of the bits that are 'off'"
   [val]
   (assert (seqable? val) "Value should be sequence")
-  (assert (= (count val) 32) "Value should be 32 bits long")
+  (assert (= (mod (count val) 8) 0) (str "Value should be `n` bits long, where `n` is divisible by 8, but was:" val))
+
   (reduce (fn [acc [val i]]
             (if-not val
               (conj acc i)

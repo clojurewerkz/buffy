@@ -15,7 +15,7 @@
           false false false false
           false false false false
           false false false false])
-      (bits-on-at [0 1 2])))
+      (bits-on-at [0 1 2] 4)))
 
 (deftest bits-off-at-test
   (is (= [false false false true
@@ -26,12 +26,12 @@
           true true true true
           true true true true
           true true true true])
-      (bits-on-at [0 1 2])))
+      (bits-on-at [0 1 2] 4)))
 
 (deftest bits-on-indexes-test
-  (is (= [0 1 2] (on-bits-indexes (bits-on-at [0 1 2]))))
-  (is (= [5 15 31] (on-bits-indexes (bits-on-at [5 15 31])))))
+  (is (= [0 1 2] (on-bits-indexes (bits-on-at [0 1 2] 4))))
+  (is (= [5 15 31] (on-bits-indexes (bits-on-at [5 15 31] 4)))))
 
 (deftest bits-off-indexes-test
-  (is (= [0 1 2] (off-bits-indexes (bits-off-at [0 1 2]))))
-  (is (= [5 15 31] (off-bits-indexes (bits-off-at [5 15 31])))))
+  (is (= [0 1 2] (off-bits-indexes (bits-off-at [0 1 2] 4))))
+  (is (= [5 15 31] (off-bits-indexes (bits-off-at [5 15 31] 4)))))
