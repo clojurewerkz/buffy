@@ -353,6 +353,10 @@ To subscribe for announcements of releases, important changes and so on, please 
 
 Buffy requires Clojure 1.4+.
 
+## Continuous Integration Status
+
+[![Continuous Integration status](https://secure.travis-ci.org/clojurewerkz/buffy.png)](http://travis-ci.org/clojurewerkz/buffy)
+
 ## Buffy Is a ClojureWerkz Project
 
 Buffy is part of the [group of Clojure libraries known as ClojureWerkz](http://clojurewerkz.org), together with
