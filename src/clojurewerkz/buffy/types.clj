@@ -49,6 +49,29 @@
   (read [by buffer idx]
     (.getMedium buffer idx)))
 
+
+
+;; Bit Field is unsafe to use in multi-threaded environment, since it involves reading
+;; before setting
+(deftype BitType []
+  BuffyType
+  (size [_] 4)
+  (write [bt buffer idx value]
+    (assert (seqable? value) "Bit Field value should be collection")
+    (assert (= (count value) 32) "Bit Field value should be 32 bits long")
+
+    (let [current-val (.getInt buffer idx)
+          changed-val (reduce (fn [acc [v index]]
+                                (if v
+                                  (bit-set acc index)
+                                  (bit-clear acc index)))
+                              current-val
+                              (map vector (take 32 value) (iterate inc 0)))]
+      (.setInt buffer idx changed-val)))
+  (read [by buffer idx]
+    (let [current-val (.getInt buffer idx)]
+      (mapv #(bit-test current-val %)  (range 0 32)))))
+
 (deftype FloatType []
   BuffyType
   (size [_] 4)
@@ -128,7 +151,7 @@
 ;; Constructors
 ;;
 
-
+(def bit-type   (memoize #(BitType.)))
 (def int32-type   (memoize #(Int32Type.)))
 (def boolean-type (memoize #(BooleanType.)))
 (def byte-type    (memoize #(ByteType.)))
