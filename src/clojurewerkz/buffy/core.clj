@@ -28,6 +28,11 @@
   ([^long initial-capacity ^long max-capacity]
      (set-writer-index (.directBuffer allocator initial-capacity max-capacity))))
 
+(defn wrapped-buffer
+  "Returns a buffer that wraps the given byte array, `j.nio.ByteBuffer` or netty `ByteBuf`"
+  [orig-buffer]
+  (set-writer-index (.wrappedBuffer orig-buffer)))
+
 (defprotocol IBuffyBuf
   (buffer [this])
   (slices [this])
@@ -79,12 +84,13 @@
   (partition 2 kvps))
 
 (defn compose-buffer
-  [spec & {:keys [buffer-type] :or {buffer-type :direct}}]
+  [spec & {:keys [buffer-type orig-buffer] :or {buffer-type :direct}}]
   (let [indexes    (zipmap (map first spec)
                            (iterate inc 0))
         types      (map second spec)
         total-size (reduce + (map size types))
         buffer     (cond
+                    orig-buffer             (wrapped-buffer orig-buffer)
                     (= buffer-type :heap)   (heap-buffer total-size)
                     (= buffer-type :direct) (direct-buffer total-size)
                     :else                   (heap-buffer total-size))

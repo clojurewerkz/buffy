@@ -293,6 +293,34 @@ When reading a field, its symbolic representation is returned:
 ;; => :QUERY
 ```
 
+## Buffer types
+
+Currently, Buffy supports `direct`, `heap` and `wrapped` buffers.
+In order to create a heap buffer:
+
+```clj
+(def my-spec (spec :first-field (int32-type)
+                   :second-field (string-type 10)))
+(compose-buffer my-spec :buffer-type :heap)
+```
+
+For off-heap (direct) buffer:
+
+```clj
+(def my-spec (spec :first-field (int32-type)
+                   :second-field (string-type 10)))
+(compose-buffer my-spec :buffer-type :direct)
+```
+
+And for wrapped buffer (that wraps the given byte array,
+`j.nio.ByteBuffer` or netty `ByteBuf`):
+
+```clj
+(def my-spec (spec :first-field (int32-type)
+                   :second-field (string-type 10)))
+(compose-buffer my-spec :buffer (java.nio.ByteBuffer/allocate 14))
+```
+
 ## Hex Dump
 
 It is possible to produce a hex-dump of a buffer created with Buffy
