@@ -107,3 +107,60 @@
     (if print
       (println res)
       res)))
+
+(defn seqable?
+  "Returns true if (seq x) will succeed, false otherwise."
+  [x]
+  (or (seq? x)
+      (instance? clojure.lang.Seqable x)
+      (nil? x)
+      (instance? Iterable x)
+      (-> x .getClass .isArray)
+      (string? x)
+      (instance? java.util.Map x)))
+
+(defn bits-on-at
+  "Given a sequence of indexes (0-based), returns a sequence of 32 booleans where indexes
+   on given positions are set to `true`"
+  [positions]
+  (assert (seqable? positions) "Positions for `bits-on-at` should be a sequence")
+  (mapv (fn [i]
+          (if (some #(= i %) positions)
+            true
+            false))
+        (range 0 32)))
+
+(defn bits-off-at
+  "Given a sequence of indexes (0-based), returns a sequence of 32 booleans where indexes
+   on given positions are set to `false`"
+  [positions]
+  (assert (seqable? positions) "Positions for `bits-off-at` should be a sequence")
+  (mapv (fn [i]
+          (if-not (some #(= i %) positions)
+            true
+            false))
+        (range 0 32)))
+
+(defn on-bits-indexes
+  "Returns indexes of the bits that are 'on'"
+  [val]
+  (assert (seqable? val) "Value should be sequence")
+  (assert (= (count val) 32) "Value should be 32 bits long")
+  (reduce (fn [acc [val i]]
+            (if val
+              (conj acc i)
+              acc))
+          []
+          (map vector val (iterate inc 0))))
+
+(defn off-bits-indexes
+  "Returns indexes of the bits that are 'off'"
+  [val]
+  (assert (seqable? val) "Value should be sequence")
+  (assert (= (count val) 32) "Value should be 32 bits long")
+  (reduce (fn [acc [val i]]
+            (if-not val
+              (conj acc i)
+              acc))
+          []
+          (map vector val (iterate inc 0))))
