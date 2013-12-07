@@ -309,3 +309,22 @@
               true true true true]]
       (set-field b :first-field v1)
       (is (= v1 (get-field b :first-field))))))
+
+(deftest wrapped-buffer-test
+  (let [s (spec :first-field (int32-type)
+                :second-field (string-type 10))
+        b (compose-buffer s :buffer (java.nio.ByteBuffer/allocate 14))]
+    (set-field b :first-field 101)
+    (is (= 101 (get-field b :first-field)))
+
+    (set-field b :first-field 10)
+    (is (= 10 (get-field b :first-field)))
+
+    (set-field b :first-field Integer/MAX_VALUE)
+    (is (= Integer/MAX_VALUE (get-field b :first-field)))
+
+    (set-field b :first-field (- Integer/MAX_VALUE))
+    (is (= (- Integer/MAX_VALUE) (get-field b :first-field)))
+
+    (set-field b :first-field -101)
+    (is (= -101 (get-field b :first-field)))))
