@@ -6,32 +6,6 @@
 (deftest positions-test
   (is (= '(0 4 14 18 22) (positions [(int32-type) (string-type 10) (int32-type) (int32-type) (string-type 16)]))))
 
-
-(deftest bit-field-write-test
-  (let [s (spec :first-field (bit-type)
-                :second-field (string-type 10))
-        b (compose-buffer s)]
-    (let [v1 [true  true  false false
-              false false false false
-              false false false false
-              false false false false
-              false false false false
-              false false false false
-              false false false false
-              false false false false]]
-      (set-field b :first-field v1)
-      (is (= v1 (get-field b :first-field))))
-    (let [v1 [true true true true
-              true true true true
-              true true true true
-              true true true true
-              true true true true
-              true true true true
-              true true true true
-              true true true true]]
-      (set-field b :first-field v1)
-      (is (= v1 (get-field b :first-field))))))
-
 (deftest bits-on-at-test
   (is (= [true true true false
           false false false false

@@ -284,3 +284,28 @@
       (if (even? i)
         (is (= i (get-field b (field i))))
         (is (= (str i) (get-field b (field i))))))))
+
+(deftest bit-field-write-test
+  (let [s (spec :first-field (bit-type)
+                :second-field (string-type 10))
+        b (compose-buffer s)]
+    (let [v1 [true  true  false false
+              false false false false
+              false false false false
+              false false false false
+              false false false false
+              false false false false
+              false false false false
+              false false false false]]
+      (set-field b :first-field v1)
+      (is (= v1 (get-field b :first-field))))
+    (let [v1 [true true true true
+              true true true true
+              true true true true
+              true true true true
+              true true true true
+              true true true true
+              true true true true
+              true true true true]]
+      (set-field b :first-field v1)
+      (is (= v1 (get-field b :first-field))))))
