@@ -40,7 +40,7 @@ Maven, add the following repository definition to your `pom.xml`:
 With Leiningen:
 
 ```clj
-[clojurewerkz/buffy "0.4.0"]
+[clojurewerkz/buffy "0.5.0"]
 ```
 
 With Maven:
@@ -49,7 +49,7 @@ With Maven:
 <dependency>
   <groupId>clojurewerkz</groupId>
   <artifactId>buffy</artifactId>
-  <version>0.4.0</version>
+  <version>0.5.0</version>
 </dependency>
 ```
 
