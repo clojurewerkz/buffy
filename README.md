@@ -178,7 +178,7 @@ contain:
 
 ### Bit type
 
-Bit type is 32 bits long sequence of bits that are turned either on or off, for example,
+Bit type is `n` bits long sequence of bits that are turned either on or off, for example,
 
 ```clj
 [true true false false
@@ -223,7 +223,7 @@ In order to use bit type, you need to give it a 32-items long sequence of
 truthy or fasly falues:
 
 ```clj
-(let [s (spec :first-field (bit-type)
+(let [s (spec :first-field (bit-type 4) ;; Bit field that fills 4 bytes
               :second-field (string-type 10))
       buf (compose-buffer s)]
   (set-field b :first-field [true  true  false false

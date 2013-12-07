@@ -53,24 +53,31 @@
 
 ;; Bit Field is unsafe to use in multi-threaded environment, since it involves reading
 ;; before setting
-(deftype BitType []
+(deftype BitType [byte-length]
   BuffyType
-  (size [_] 4)
+  (size [_] byte-length)
   (write [bt buffer idx value]
     (assert (seqable? value) "Bit Field value should be collection")
-    (assert (= (count value) 32) "Bit Field value should be 32 bits long")
+    (assert (= (count value) (* byte-length 8)) (str "Bit Field value should be " (* byte-length 4) " bits long"))
 
-    (let [current-val (.getInt buffer idx)
-          changed-val (reduce (fn [acc [v index]]
-                                (if v
-                                  (bit-set acc index)
-                                  (bit-clear acc index)))
-                              current-val
-                              (map vector (take 32 value) (iterate inc 0)))]
-      (.setInt buffer idx changed-val)))
+    (doseq [byte-index (range 0 byte-length)]
+      (let [idx         (+ idx (- byte-length 1 byte-index))
+            current-val (.getByte buffer idx)
+            changed-val (reduce (fn [acc [v index]]
+                                  (if v
+                                    (bit-set acc index)
+                                    (bit-clear acc index)))
+                                current-val
+                                (map vector
+                                     (->> value (drop (* 8 byte-index)) (take 8))
+                                     (iterate inc 0)))]
+        (.setByte buffer idx changed-val))))
   (read [by buffer idx]
-    (let [current-val (.getInt buffer idx)]
-      (mapv #(bit-test current-val %)  (range 0 32)))))
+    (mapcat identity
+            (for [byte-index (range 0 byte-length)]
+              (let [idx         (+ idx (- byte-length 1 byte-index))
+                    current-val (.getByte buffer idx)]
+                (mapv #(bit-test current-val %)  (range 0 8)))))))
 
 (deftype FloatType []
   BuffyType
@@ -151,7 +158,7 @@
 ;; Constructors
 ;;
 
-(def bit-type   (memoize #(BitType.)))
+(def bit-type   (memoize (fn [length]  (BitType. length))))
 (def int32-type   (memoize #(Int32Type.)))
 (def boolean-type (memoize #(BooleanType.)))
 (def byte-type    (memoize #(ByteType.)))

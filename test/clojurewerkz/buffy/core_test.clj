@@ -286,7 +286,7 @@
         (is (= (str i) (get-field b (field i))))))))
 
 (deftest bit-field-write-test
-  (let [s (spec :first-field (bit-type)
+  (let [s (spec :first-field (bit-type 4)
                 :second-field (string-type 10))
         b (compose-buffer s)]
     (let [v1 [true  true  false false

@@ -125,9 +125,7 @@
   [positions]
   (assert (seqable? positions) "Positions for `bits-on-at` should be a sequence")
   (mapv (fn [i]
-          (if (some #(= i %) positions)
-            true
-            false))
+          (some #(= i %) positions))
         (range 0 32)))
 
 (defn bits-off-at
@@ -136,9 +134,7 @@
   [positions]
   (assert (seqable? positions) "Positions for `bits-off-at` should be a sequence")
   (mapv (fn [i]
-          (if-not (some #(= i %) positions)
-            true
-            false))
+          (not (some #(= i %) positions)))
         (range 0 32)))
 
 (defn on-bits-indexes
