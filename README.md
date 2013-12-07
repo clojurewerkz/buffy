@@ -176,6 +176,66 @@ contain:
 (bytes-type 25)
 ```
 
+### Bit type
+
+Bit type is 32 bits long sequence of bits that are turned either on or off, for example,
+
+```clj
+[true true false false
+ false false false false
+ false false false false
+ false false false false
+ false false false false
+ false false false false
+ false false false false
+ false false false false]
+```
+
+Translates to binary
+
+```
+0000 0000 0000 00011
+```
+
+Which translates to decimal `3`, that is stored in a 4-bits integer field.
+
+There are some helper functions, such as:
+
+```clj
+(clojurewerkz.buffy.util/bits-on-at [0 1 2])
+
+[true true true false
+ false false false false
+ false false false false
+ false false false false
+ false false false false
+ false false false false
+ false false false false
+ false false false false]
+```
+
+Or an inverse of it, `clojurewerkz.buffy.util/bits-off-at`.
+
+Also, `on-bits-indexes` that returns positions at which bits are set, and
+`off-bits-indexes` that returns positions at which bits are cleared.
+
+In order to use bit type, you need to give it a 32-items long sequence of
+truthy or fasly falues:
+
+```clj
+(let [s (spec :first-field (bit-type)
+              :second-field (string-type 10))
+      buf (compose-buffer s)]
+  (set-field b :first-field [true  true  false false
+                             false false false false
+                             false false false false
+                             false false false false
+                             false false false false
+                             false false false false
+                             false false false false
+                             false false false false]))
+```
+
 ### Complex (Composite) Types
 
 Composite types combine multiple primitive types.
