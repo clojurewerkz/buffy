@@ -15,7 +15,11 @@
   (write [bt buffer idx value]
     (.setInt buffer idx value))
   (read [by buffer idx]
-    (.getInt buffer idx)))
+    (.getInt buffer idx))
+
+  Object
+  (toString [_]
+    "Int32Type"))
 
 (deftype BooleanType []
   BuffyType
@@ -23,7 +27,11 @@
   (write [bt buffer idx value]
     (.setBoolean buffer idx value))
   (read [by buffer idx]
-    (.getBoolean buffer idx)))
+    (.getBoolean buffer idx))
+
+  Object
+  (toString [_]
+    "BooleanType"))
 
 (deftype ByteType []
   BuffyType
@@ -31,7 +39,11 @@
   (write [bt buffer idx value]
     (.setByte buffer idx value))
   (read [by buffer idx]
-    (.getByte buffer idx)))
+    (.getByte buffer idx))
+
+  Object
+  (toString [_]
+    "ByteType"))
 
 (deftype ShortType []
   BuffyType
@@ -39,7 +51,11 @@
   (write [bt buffer idx value]
     (.setShort buffer idx value))
   (read [by buffer idx]
-    (.getShort buffer idx)))
+    (.getShort buffer idx))
+
+  Object
+  (toString [_]
+    "ShortType"))
 
 (deftype MediumType []
   BuffyType
@@ -47,7 +63,11 @@
   (write [bt buffer idx value]
     (.setMedium buffer idx value))
   (read [by buffer idx]
-    (.getMedium buffer idx)))
+    (.getMedium buffer idx))
+
+  Object
+  (toString [_]
+    "MediumType"))
 
 
 
@@ -77,7 +97,11 @@
             (for [byte-index (range 0 byte-length)]
               (let [idx         (+ idx (- byte-length 1 byte-index))
                     current-val (.getByte buffer idx)]
-                (mapv #(bit-test current-val %)  (range 0 8)))))))
+                (mapv #(bit-test current-val %)  (range 0 8))))))
+
+  Object
+  (toString [_]
+    (str "Bit Type: " byte-length)))
 
 (deftype FloatType []
   BuffyType
@@ -85,7 +109,11 @@
   (write [bt buffer idx value]
     (.setFloat buffer idx value))
   (read [by buffer idx]
-    (.getFloat buffer idx)))
+    (.getFloat buffer idx))
+
+  Object
+  (toString [_]
+    "FloatType"))
 
 (deftype LongType []
   BuffyType
@@ -93,7 +121,11 @@
   (write [bt buffer idx value]
     (.setLong buffer idx value))
   (read [by buffer idx]
-    (.getLong buffer idx)))
+    (.getLong buffer idx))
+
+  Object
+  (toString [_]
+    "LongType"))
 
 (deftype BytesType [size]
   BuffyType
@@ -102,7 +134,11 @@
     (.setBytes buffer idx value)
     (zero-fill-till-end buffer idx (count value) (.size bt)))
   (read [bt buffer idx]
-    (read-nonempty-bytes buffer idx (.size bt))))
+    (read-nonempty-bytes buffer idx (.size bt)))
+
+  Object
+  (toString [_]
+    (str "BytesType: (" size ")")))
 
 (deftype StringType [size]
   BuffyType
@@ -113,7 +149,11 @@
     (zero-fill-till-end buffer idx (count value) size))
   (read [bt buffer idx]
     (String.
-     (read-nonempty-bytes buffer idx (.size bt)))))
+     (read-nonempty-bytes buffer idx (.size bt))))
+
+  Object
+  (toString [_]
+    (str "StringType (" size ")")))
 
 ;;
 ;; Comples types
@@ -138,7 +178,11 @@
   (read [bt buffer idx]
     (into []
           (for [[type position] (map vector types (positions types))]
-            (.read type buffer (+ idx position))))))
+            (.read type buffer (+ idx position)))))
+
+  Object
+  (toString [_]
+    (str "CompositeType: (" (clojure.string/join ", " (mapv str types)) ")")))
 
 (deftype RepeatedType [type times]
   BuffyType

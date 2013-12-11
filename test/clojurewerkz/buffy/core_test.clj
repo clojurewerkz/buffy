@@ -219,7 +219,7 @@
                 :third-field  (boolean-type))
         b (compose-buffer s)]
 
-    (set-fields b {:first-field 101
+    (compose b {:first-field 101
                    :second-field "string"
                    :third-field true})
     (is (= {:third-field true :second-field "string" :first-field 101}
