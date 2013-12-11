@@ -1,6 +1,7 @@
 (ns clojurewerkz.buffy.core
   (:refer-clojure :exclude [read])
   (:require [clojurewerkz.buffy.types :as t]
+            [clojurewerkz.buffy.frames :refer :all]
             [clojurewerkz.buffy.util :refer :all]
             [clojurewerkz.buffy.types.protocols :refer :all])
   (:import [io.netty.buffer UnpooledByteBufAllocator ByteBufAllocator]))
@@ -33,11 +34,13 @@
   [orig-buffer]
   (set-writer-index (.wrappedBuffer orig-buffer)))
 
+(defprotocol Composable
+  (decompose [this] [this buffer])
+  (compose [this kvps]))
+
 (defprotocol IBuffyBuf
   (buffer [this])
   (slices [this])
-  (decompose [this])
-  (set-fields [this kvps])
 
   (get-field [this field-name])
   (get-field-idx [this field-idx])
@@ -48,10 +51,6 @@
 (deftype BuffyBuf [buf indexes types positions]
   IBuffyBuf
   (buffer [b] buf)
-
-  (set-fields [this kvps]
-    (doseq [[k v] kvps]
-      (set-field this k v)))
 
   (set-field [b field-name value]
     (let [idx      (get (.indexes b) field-name)
@@ -74,10 +73,46 @@
             (.buf b)
             position)))
 
+  Composable
+  (compose [this kvps]
+    (doseq [[k v] kvps]
+      (set-field this k v))
+    buf)
+
   (decompose [b]
     (into {}
           (for [[field _] indexes]
             [field (.get-field b field)]))))
+
+(deftype DynamicBuffer [frames]
+  Composable
+  (compose [this values]
+    (let [sizes  (->> (interleave frames values)
+                      (partition 2)
+                      (map (fn [[t v]] (encoding-size t v)))
+                      vec)
+          buffer (direct-buffer (reduce + sizes))]
+      (loop [[[frame value] & more] (partition 2 (interleave frames values))
+             [size & more-sizes] sizes
+             idx           0]
+        (write frame buffer idx value)
+        (when (not (empty? more))
+          (recur more sizes (+ idx size))))
+      buffer))
+
+  (decompose [this buffer]
+    (loop [[frame & more] frames
+           idx            0
+           acc            []]
+      (if (nil? frame)
+        acc
+        (let [size  (decoding-size frame buffer idx)
+              value (read frame buffer idx)]
+          (recur more (+ idx size) (conj acc value)))))))
+
+(defn dynamic-buffer
+  [& frames]
+  (DynamicBuffer. (vec frames)))
 
 (defn spec
   [& kvps]
