@@ -1,4 +1,4 @@
-(defproject clojurewerkz/buffy "1.0.0-beta1"
+(defproject clojurewerkz/buffy "1.0.0-beta2-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
