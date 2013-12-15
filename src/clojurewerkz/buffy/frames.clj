@@ -71,11 +71,56 @@
 
   Object
   (toString [_]
-    "Int32Type"))
+    "Frame"))
 
+(deftype CompositeFrame [subframes]
+  BuffyType
+  (size [_] (throw (RuntimeException. "Can't determine size of composite frame")))
+
+  (write [_ buffer idx values]
+    (let [sizes  (->> (interleave subframes values)
+                      (partition 2)
+                      (map (fn [[t v]] (encoding-size t v)))
+                      vec)]
+      (loop [[[frame value] & more] (partition 2 (interleave subframes values))
+             [size & more-sizes] sizes
+             idx           0]
+        (write frame buffer idx value)
+        (when (not (empty? more))
+          (recur more sizes (+ idx size))))
+      buffer)
+    )
+  (read [_ buffer idx]
+    (loop [[frame & more] subframes
+           idx            0
+           acc            []]
+      (if (nil? frame)
+        acc
+        (let [size  (decoding-size frame buffer idx)
+              value (read frame buffer idx)]
+          (recur more (+ idx size) (conj acc value)))))
+
+    )
+
+  Frame
+  (encoding-size [_ values]
+    (reduce + (map (fn [[a b]] (encoding-size a b)) (partition 2 (interleave subframes (map identity values))))))
+
+  (decoding-size [_ buffer idx]
+    (loop [size 0
+           idx  idx
+           [frame & more] subframes]
+      (if (nil? frame)
+        size
+        (let [frame-size (decoding-size frame buffer idx)]
+          (recur (+ size frame-size) (+ idx frame-size) more))))))
 
 (defn frame-type
   ([encoder decoder]
      (FrameType. encoder decoder identity))
   ([encoder decoder value-formatter]
      (FrameType. encoder decoder value-formatter)))
+
+(defn composite-frame
+  [& subframes]
+  (CompositeFrame. subframes))
