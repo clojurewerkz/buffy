@@ -10,10 +10,10 @@
             [simple-check.properties :as prop]))
 
 (deftest dynamic-roundtrip-test
-  (let [string-encoder (defframeencoder [value]
+  (let [string-encoder (frame-encoder [value]
                          length (short-type) (count value)
                          string (string-type (count value)) value)
-        string-decoder (defframedecoder [buffer offset]
+        string-decoder (frame-decoder [buffer offset]
                          length (short-type)
                          string (string-type (read length buffer offset)))
         b              (dynamic-buffer (frame-type string-encoder string-decoder second)
@@ -24,10 +24,10 @@
                       (compose b ["super-duper-random-string" "long-ans-senseless-stringyoyoyo"]))))))
 
 (deftest encoding-size-test
-  (let [string-encoder (defframeencoder [value]
+  (let [string-encoder (frame-encoder [value]
                          length (short-type) (count value)
                          string (string-type (count value)) value)
-        string-decoder (defframedecoder [buffer offset]
+        string-decoder (frame-decoder [buffer offset]
                          length (short-type)
                          string (string-type (read length buffer offset)))
         string-frame (frame-type string-encoder string-decoder second)]
@@ -35,10 +35,10 @@
     (is (= 8 (encoding-size string-frame "abcdef")))))
 
 (deftest dynamic-stringmap-test
-  (let [string-encoder (defframeencoder [value]
+  (let [string-encoder (frame-encoder [value]
                          length (short-type) (count value)
                          string (string-type (count value)) value)
-        string-decoder (defframedecoder [buffer offset]
+        string-decoder (frame-decoder [buffer offset]
                          length (short-type)
                          string (string-type (read length buffer offset)))
         b              (dynamic-buffer
@@ -51,21 +51,21 @@
                       (compose b [["stringaaaasd" "stringbbb"]]))))))
 
 (deftest complex-encoding-decoding
-  (let [string-encoder   (defframeencoder [value]
+  (let [string-encoder   (frame-encoder [value]
                            length (short-type) (count value)
                            string (string-type (count value))
                            value)
-        string-decoder   (defframedecoder [buffer offset]
+        string-decoder   (frame-decoder [buffer offset]
                            length (short-type)
                            string (string-type (read length buffer offset)))
         string-frame     (frame-type string-encoder string-decoder second)
         kvp-frame        (composite-frame
                           (frame-type string-encoder string-decoder second)
                           (frame-type string-encoder string-decoder second))
-        map-encoder      (defframeencoder [value]
+        map-encoder      (frame-encoder [value]
                            length (short-type) (count value)
                            map (repeated-frame kvp-frame (count value)) value)
-        map-decoder      (defframedecoder [buffer offset]
+        map-decoder      (frame-decoder [buffer offset]
                            length (short-type)
                            map    (repeated-frame kvp-frame (read length buffer offset)))
         b                (dynamic-buffer (frame-type map-encoder

@@ -321,6 +321,143 @@ And for wrapped buffer (that wraps the given byte array,
 (compose-buffer my-spec :buffer (java.nio.ByteBuffer/allocate 14))
 ```
 
+## Dynamic Frames
+
+If you're working with sophisticated protocols, more often than not you can't know
+the buffer size before you construct an entire type. One of the most primitive examples
+is `netstrings` protocol, that consists of
+
+```clj
+(short-type) ;; Identifies the length of string
+(string-type 10) ;; Identifies the string itself
+```
+
+Problem with construction of such type lays in the fact that you can't construct a buffer
+before you know the value of the string itself. Buffy helps you here, too. This feature
+is called dynamic frame. In order to construct a dynamic frame, you should create an
+encoder and decoder. Let's take a closer look at netstrings protocol implementation:
+
+First, encoder:
+
+```clj
+(frame-encoder [value]
+               ;; Name     ;; Child frame or type      ;; Dynamic value
+               length      (short-type)                (count value)
+               string      (string-type (count value)) value)
+```
+
+Here, in a binding you have a `value`. `length` part of the frame is a `short-type` that
+holds a length of the string, you specify this value through `(count value)`.
+
+Next off, the `string` itself, that is a `string-type` and holds a `value` itself.
+
+Decoder is written in a same manner:
+
+```clj
+(frame-decoder [buffer offset]
+               length (short-type)
+               string (string-type (read length buffer offset)))
+```
+
+Since values are not decoded by that time just yet, and you may need access to an entire
+buffer in order to read a certain field's value, you specify only types and have a possibility
+of "look-behind", using already constructed types.
+
+So, `string` type is constructed by reading off the `length` as a first field of the frame.
+
+An entire frame would look as follows:
+
+```clj
+(def dynamic-string-payload
+  (dynamic-buffer
+   (frame-type
+    (frame-encoder [value]
+                   length (short-type) (count value)
+                   string (string-type (count value)) value)
+    (frame-decoder [buffer offset]
+                   length (short-type)
+                   string (string-type (read length buffer offset)))
+    second ;; Value Formatter
+    )))
+```
+
+`second` here is just a value formatter. When we read off the value from the buffer, we see the
+`short` as well as `string`, but it's just a helper for correct decomposition, therefore
+we should discard it and take only second value, which is a string itself.
+
+In order to compose/decompose it, you should use `compose` and `decompose` functions:
+
+```clj
+(compose dynamic-string-payload ["super-duper-random-string" "long-ans-senseless-stringyoyoyo"])
+```
+
+This one will return a buffer. Same with `decompose`, that receives dynamic buffer and a value,
+and returns deserialised value.
+
+You can go ahead and create even more complicated patterns. For example, you can construct
+a map of strings (as in Cassandra binary CQL protocol), where map is specified by
+
+```
+<short>|(repeated <string>|<string>)
+```
+
+Where each `<string>` is actually
+
+```
+<short>|<string itself>
+```
+
+It's implementation is a little bit more complex, but still reasonably simple. First, we
+define a dynamic string frame in the same manner as we made with `netstrings`:
+
+```clj
+(def dynamic-string
+  (frame-type
+   (frame-encoder [value]
+                  length (short-type) (count value)
+                  string (string-type (count value))
+                  value)
+   (frame-decoder [buffer offset]
+                  length (short-type)
+                  string (string-type (read length buffer offset)))
+   second))
+```
+
+Next off, key-value pairs. Each one of them is nothing more than a string repeated twice.
+
+```clj
+(def key-value-pair
+  (composite-frame
+   dynamic-string
+   dynamic-string))
+```
+
+Next is dynamic map, which is a frame type that holds a `length` which is `short-type` and
+`repeated-frame` of `key-value-pairs`:
+
+```clj
+(def dynamic-map
+  (frame-type
+   (frame-encoder [value]
+                  length (short-type) (count value)
+                  map    (repeated-frame key-value-pair (count value)) value)
+   (frame-decoder [buffer offset]
+                  length (short-type)
+                  map    (repeated-frame key-value-pair (read length buffer offset)))
+   second))
+```
+
+Now, our dynamic map is ready for composition and decomposition:
+
+```clj
+(let [dynamic-type (dynamic-buffer dynamic-map)]
+  (compose dynamic-type [[["key1" "value1"] ["key1" "value1"] ["key1" "value1"]]]) ;; Returns a constructred buffer
+
+  (-> dynamic-type
+      (compose [[["key1" "value1"] ["key1" "value1"] ["key1" "value1"]]])
+      decompose) ;; Decomposes it back to the key-value pairs
+```
+
 ## Hex Dump
 
 It is possible to produce a hex-dump of a buffer created with Buffy
