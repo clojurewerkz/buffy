@@ -87,32 +87,16 @@
 (deftype DynamicBuffer [frames]
   Composable
   (compose [this values]
-    (let [sizes  (->> (interleave frames values)
-                      (partition 2)
-                      (map (fn [[t v]] (encoding-size t v)))
-                      vec)
-          buffer (direct-buffer (reduce + sizes))]
-      (loop [[[frame value] & more] (partition 2 (interleave frames values))
-             [size & more-sizes] sizes
-             idx           0]
-        (write frame buffer idx value)
-        (when (not (empty? more))
-          (recur more sizes (+ idx size))))
-      buffer))
+    (let [size   (encoding-size frames values)
+          buffer (direct-buffer size)]
+      (write frames buffer 0 values)))
 
   (decompose [this buffer]
-    (loop [[frame & more] frames
-           idx            0
-           acc            []]
-      (if (nil? frame)
-        acc
-        (let [size  (decoding-size frame buffer idx)
-              value (read frame buffer idx)]
-          (recur more (+ idx size) (conj acc value)))))))
+    (read frames buffer 0)))
 
 (defn dynamic-buffer
   [& frames]
-  (DynamicBuffer. (vec frames)))
+  (DynamicBuffer. (apply composite-frame frames)))
 
 (defn spec
   [& kvps]
