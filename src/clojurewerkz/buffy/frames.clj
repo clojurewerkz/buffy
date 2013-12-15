@@ -20,7 +20,7 @@
 
 (defn third [[_ _ x]] x)
 
-(defmacro defframeencoder
+(defmacro frame-encoder
   [binding & triplets]
   (let [triplets (partition 3 triplets)]
     `(fn* ~binding
@@ -38,7 +38,7 @@
          (list 'let [f s] (make-decoder-bindings more types))
          (list 'let [f s] (cons 'composite-frame types))))))
 
-(defmacro defframedecoder
+(defmacro frame-decoder
   [binding & tuples]
   (let [buffer (first binding)
         tuples (partition 2 tuples)]
