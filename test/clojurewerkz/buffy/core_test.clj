@@ -188,7 +188,7 @@
     (is (= [[1 "abcde1"] [2 "abcde2"] [3 "abcde3"] [4 "abcde4"] [5 "abcde5"]]
            (get-field b :second-field)))))
 
-(deftest enum-field-write-test
+(deftest enum-field-write-test-1
   (let [spec {:first-field (int32-type)
               :second-field (enum-type (long-type) {:STARTUP 0x02 :QUERY 0x07})}
         b    (compose-buffer spec)]
@@ -199,7 +199,7 @@
     (is (= :QUERY
            (get-field b :second-field)))))
 
-(deftest enum-field-write-test
+(deftest enum-field-write-test-2
   (let [s (spec :first-field (int32-type)
                 :second-field (enum-type (repeated-type (composite-type (int32-type) (string-type 10)) 5)
                                          {:FIRST [[1 "abcde1"] [2 "abcde2"] [3 "abcde3"] [4 "abcde4"] [5 "abcde5"]]
