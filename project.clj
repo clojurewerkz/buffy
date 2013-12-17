@@ -1,5 +1,5 @@
 (defproject clojurewerkz/buffy "1.0.0-beta2-SNAPSHOT"
-  :description "FIXME: write description"
+  :description "Clojure library for working with binary data"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
