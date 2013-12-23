@@ -14,8 +14,8 @@
           false false false false
           false false false false
           false false false false
-          false false false false])
-      (bits-on-at [0 1 2] 4)))
+          false false false false]
+         (bits-on-at [0 1 2] 4))))
 
 (deftest bits-off-at-test
   (is (= [false false false true
@@ -25,8 +25,8 @@
           true true true true
           true true true true
           true true true true
-          true true true true])
-      (bits-on-at [0 1 2] 4)))
+          true true true true]
+         (bits-on-at [0 1 2] 4))))
 
 (deftest bits-on-indexes-test
   (is (= [0 1 2] (on-bits-indexes (bits-on-at [0 1 2] 4))))
