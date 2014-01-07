@@ -458,7 +458,7 @@ Now, our dynamic map is ready for composition and decomposition:
       decompose) ;; Decomposes it back to the key-value pairs
 ```
 
-## Working with bytes
+## Working with bits
 
 In Java, it is impossible to work with bytes themselves, therefore we've added some wrapper functions
 for existing types, that may represent your values as series of 1s and 0es. For example, you can convert
