@@ -458,7 +458,7 @@ Now, our dynamic map is ready for composition and decomposition:
       decompose) ;; Decomposes it back to the key-value pairs
 ```
 
-## Working with bits
+## Working With Bits
 
 In Java, there are no data types for bits, therefore
 we've added some wrapper functions for existing types, that may
