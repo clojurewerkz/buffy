@@ -130,3 +130,29 @@
 (def composite-type t/composite-type)
 (def repeated-type  t/repeated-type)
 (def enum-type  t/enum-type)
+
+(defn to-bit-map
+  "Converts given value to vector of `true`/`false`, which represent on
+   and off set bytes."
+  [type value]
+  (let [length (size type)
+        buffer (heap-buffer length)
+        _      (write type buffer 0 value)
+        bt     (bit-type length)]
+    (reverse (read bt buffer 0))))
+
+(defn from-bit-map
+  "Converts a vector of `true`/`false`, which represent a series of on
+   and off set bytes to the actual value, based on given `type`."
+  [type value]
+  (let [length (size type)
+        bt     (bit-type length)
+        buffer (heap-buffer length)
+        _      (write bt buffer 0 (reverse value))]
+    (read type buffer 0)))
+
+(defn to-binary
+  "Converts series of `true`/`false` flags to series of `1` and `0` where
+   1 is represents `on` and `0` represents `off`."
+  [value]
+  (mapv #(if % 1 0) value))

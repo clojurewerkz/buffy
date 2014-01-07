@@ -328,3 +328,44 @@
 
     (set-field b :first-field -101)
     (is (= -101 (get-field b :first-field)))))
+
+(deftest to-bit-map-test
+  (is (= [0 0 0 0
+          0 0 0 0
+
+          0 0 0 0
+          0 0 0 0
+
+          0 0 0 0
+          0 0 0 0
+
+          0 1 1 0
+          0 1 0 1]
+         (->> 101 (to-bit-map (int32-type)) to-binary)))
+
+  (is (= [0 0 0 0
+          0 0 0 0
+
+          0 0 0 1
+          0 0 1 1
+
+          0 0 1 0
+          0 0 1 1
+
+          0 1 0 0
+          0 1 0 0]
+         (->> 1254212 (to-bit-map (int32-type)) to-binary))))
+
+(deftest to-bit-roundtrip-test
+  (let [num 101]
+    (is (= num)
+        (->> num
+             (to-bit-map (int32-type))
+             to-binary
+             (from-bit-map (int32-type)))))
+  (let [num 1254212]
+    (is (= num)
+        (->> num
+             (to-bit-map (int32-type))
+             to-binary
+             (from-bit-map (int32-type))))))
