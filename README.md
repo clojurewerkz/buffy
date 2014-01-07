@@ -458,11 +458,12 @@ Now, our dynamic map is ready for composition and decomposition:
       decompose) ;; Decomposes it back to the key-value pairs
 ```
 
-## Working with bits
+## Working With Bits
 
-In Java, it is impossible to work with bytes themselves, therefore we've added some wrapper functions
-for existing types, that may represent your values as series of 1s and 0es. For example, you can convert
-an integer `101` to it's binary representation:
+In Java, there are no data types for bits, therefore
+we've added some wrapper functions for existing types, that may
+represent your values as series of 1s and 0es. For example, you can
+convert an integer `101` to it's binary representation:
 
 ```clj
 (to-bit-map (int32-type) 101)
@@ -471,8 +472,8 @@ an integer `101` to it's binary representation:
 This will return a bitmap of `0000 0000   0000 0000   0000 0000   0110 0101` (represented as
 vector of `true` and `false`), which is a binary representation of `101`.
 
-Same way, you can convert a bitmap consisting of `true` and `false` back to it's actual value with `from-bit-map`
-function.
+Same way, you can convert a bitmap consisting of `true` and `false`
+back to it's actual value with `from-bit-map` function.
 
 ## Hex Dump
 
