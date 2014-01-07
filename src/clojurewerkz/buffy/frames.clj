@@ -46,12 +46,21 @@
           ~(make-decoder-bindings tuples))))
 
 (defprotocol Frame
+  (encoder-for [this value])
+  (decoder-for [this buffer idx])
+
   (encoding-size [this value])
   (decoding-size [this buffer idx]))
 
 (deftype FrameType [encoder decoder value-formatter]
   BuffyType
   (size [_] (throw (RuntimeException. "Can't determine size of the frame")))
+
+  (encoder-for [this value]
+    (encoder value))
+
+  (decoder-for [this buffer idx]
+    (decoder buffer idx))
 
   (write [bt buffer idx value]
     (let [[type values] (encoder value)]
@@ -64,16 +73,14 @@
      (.read (decoder buffer idx)
             buffer
             idx)))
+
   Frame
   (encoding-size [_ value]
     (->> value
         encoder
-        ;; first
-        ;; (encoding-size* value)
         (partition 2)
         (map (fn [[a b]] (encoding-size* a b)))
-        (reduce +)
-        ))
+        (reduce +)))
 
   (decoding-size [_ buffer idx]
     (decoding-size* (decoder buffer idx) buffer idx))
@@ -82,24 +89,25 @@
   (toString [_]
     "Frame"))
 
+(defn composite-frame-sizes
+  [subframes values]
+  (->> values
+       (interleave subframes)
+       (partition 2)
+       (map (fn [[t v]] (encoding-size* t v)))))
+
 (deftype CompositeFrame [subframes]
   BuffyType
   (size [_] (throw (RuntimeException. "Can't determine size of composite frame")))
 
   (write [_ buffer idx values]
-    (let [sizes  (->> (interleave subframes values)
-                      (partition 2)
-                      (map (fn [[t v]] (encoding-size* t v)))
-                      vec)]
-      (loop [[[frame value] & more] (partition 2 (interleave subframes values))
-             [size & more-sizes] sizes
-             idx           idx]
-        ;; ?? remove when, shouldn't happen
-        (when frame
-          (write frame buffer idx value))
-        (when (not (empty? more))
-          (recur more sizes (+ idx size))))
-      buffer))
+    (loop [[[frame value] & more] (partition 2 (interleave subframes values))
+           [size & more-sizes]    (composite-frame-sizes subframes values)
+           idx                    idx]
+      (write frame buffer idx value)
+      (when (not (empty? more))
+        (recur more more-sizes (+ idx size))))
+    buffer)
 
   (read [_ buffer idx]
     (loop [[frame & more] subframes
@@ -113,11 +121,7 @@
 
   Frame
   (encoding-size [_ values]
-    (->>  values
-          (interleave subframes)
-          (partition 2)
-          (map (fn [[a b]] (encoding-size* a b)))
-          (reduce + )))
+    (reduce + (composite-frame-sizes subframes values)))
 
   (decoding-size [_ buffer idx]
     (loop [size 0
