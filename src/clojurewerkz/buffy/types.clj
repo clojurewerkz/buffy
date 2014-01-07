@@ -69,10 +69,6 @@
   (toString [_]
     "MediumType"))
 
-
-
-;; Bit Field is unsafe to use in multi-threaded environment, since it involves reading
-;; before setting
 (deftype BitType [byte-length]
   BuffyType
   (size [_] byte-length)
@@ -82,12 +78,11 @@
 
     (doseq [byte-index (range 0 byte-length)]
       (let [idx         (+ idx (- byte-length 1 byte-index))
-            current-val (.getByte buffer idx)
             changed-val (reduce (fn [acc [v index]]
                                   (if v
                                     (bit-set acc index)
                                     (bit-clear acc index)))
-                                current-val
+                                0
                                 (map vector
                                      (->> value (drop (* 8 byte-index)) (take 8))
                                      (iterate inc 0)))]
@@ -97,7 +92,7 @@
             (for [byte-index (range 0 byte-length)]
               (let [idx         (+ idx (- byte-length 1 byte-index))
                     current-val (.getByte buffer idx)]
-                (mapv #(bit-test current-val %)  (range 0 8))))))
+                (map #(bit-test current-val %) (range 0 8))))))
 
   Object
   (toString [_]
