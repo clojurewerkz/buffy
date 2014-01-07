@@ -26,7 +26,7 @@
           true true true true
           true true true true
           true true true true]
-         (bits-on-at [0 1 2] 4))))
+         (bits-off-at [0 1 2] 4))))
 
 (deftest bits-on-indexes-test
   (is (= [0 1 2] (on-bits-indexes (bits-on-at [0 1 2] 4))))
