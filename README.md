@@ -458,6 +458,22 @@ Now, our dynamic map is ready for composition and decomposition:
       decompose) ;; Decomposes it back to the key-value pairs
 ```
 
+## Working with bytes
+
+In Java, it is impossible to work with bytes themselves, therefore we've added some wrapper functions
+for existing types, that may represent your values as series of 1s and 0es. For example, you can convert
+an integer `101` to it's binary representation:
+
+```clj
+(to-bit-map (int32-type) 101)
+```
+
+This will return a bitmap of `0000 0000   0000 0000   0000 0000   0110 0101` (represented as
+vector of `true` and `false`), which is a binary representation of `101`.
+
+Same way, you can convert a bitmap consisting of `true` and `false` back to it's actual value with `from-bit-map`
+function.
+
 ## Hex Dump
 
 It is possible to produce a hex-dump of a buffer created with Buffy
@@ -531,4 +547,3 @@ the [Apache Public License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/clojurewerkz/buffy/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
