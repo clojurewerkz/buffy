@@ -358,19 +358,15 @@
 
 (deftest to-bit-roundtrip-test
   (let [num 101]
-    (is (= num)
-        (->> num
-             (to-bit-map (int32-type))
-             to-binary
-             (from-bit-map (int32-type)))))
+    (is (= num
+           (->> num
+                (to-bit-map (int32-type))
+                (from-bit-map (int32-type))))))
   (let [num 1254212]
-    (is (= num)
-        (->> num
-             (to-bit-map (int32-type))
-             to-binary
-             (from-bit-map (int32-type))))))
-
-
+    (is (= num
+           (->> num
+                (to-bit-map (int32-type))
+                (from-bit-map (int32-type)))))))
 
 (deftest very-bit-bit-set-test
   (let [cap 800
