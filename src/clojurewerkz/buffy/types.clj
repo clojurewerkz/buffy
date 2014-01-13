@@ -98,6 +98,51 @@
   (toString [_]
     (str "Bit Type: " byte-length)))
 
+(defn- bit-map-extract-field-value [value field-name field-length]
+  (let [mask (dec (bit-shift-left (long 1) field-length))
+        field-raw-value (get value field-name)]
+    (case field-raw-value
+      true  1
+      false 0
+      nil   0
+      (bit-and mask field-raw-value))))
+
+(defn- bit-map-hash-map->long-value [value fields]
+  (reduce (fn [out [field-name field-length]]
+            (+ (bit-map-extract-field-value value
+                                            field-name
+                                            field-length)
+               (bit-shift-left out field-length)))
+          (long 0)
+          fields))
+
+(defn- bit-map-bits->long [bits]
+  (reduce (fn [accu x] (+ (bit-shift-left accu 1)
+                          (if x 1 0)))
+          (long 0)
+          bits))
+
+(defn- bit-map-bits->hash-map [bits fields]
+    (first
+     (reduce
+      (fn [[out remaining] [field-name field-length]]
+        [(assoc out field-name
+                (bit-map-bits->long (take field-length remaining)))
+         (drop field-length remaining)])
+      [{} bits]
+      fields)))
+
+(deftype BitMapType [inner-bits fields]
+  BuffyType
+  (size [_] (size inner-bits))
+  (write [bt buffer idx value]
+    (let [bit-map-value (bit-map-hash-map->long-value value fields)
+          bit-indexes   (reverse (range (* 8 (size inner-bits))))]
+      (write inner-bits buffer idx
+             (mapv #(bit-test bit-map-value %) bit-indexes))))
+  (read [by buffer idx]
+    (bit-map-bits->hash-map (read inner-bits buffer idx) fields)))
+
 (deftype FloatType []
   BuffyType
   (size [_] 4)
@@ -193,6 +238,7 @@
           (for [position (positions (repeat times type))]
             (.read type buffer (+ idx position))))))
 
+
 ;;
 ;; Constructors
 ;;
@@ -208,6 +254,15 @@
 (def long-type    (memoize #(LongType.)))
 (def string-type  (memoize (fn [length] (StringType. length))))
 (def bytes-type   (memoize (fn [length] (BytesType. length))))
+(def bit-map-type
+  (memoize
+   (fn [& fields]
+     (assert (even? (count fields)) "requires an even number of forms")
+     (let [inner-fields (mapv vec (partition 2 fields))
+           inner-bits-count (reduce + (map second inner-fields))]
+       (assert (zero? (mod inner-bits-count 8))
+               "sum of all bit-map field should be multiple of 8")
+       (BitMapType. (bit-type (/ inner-bits-count 8)) inner-fields)))))
 
 (defn composite-type
   [& types]
