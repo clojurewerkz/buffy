@@ -358,27 +358,12 @@
 
 (deftest to-bit-roundtrip-test
   (let [num 101]
-    (is (= num)
-        (->> num
-             (to-bit-map (int32-type))
-             to-binary
-             (from-bit-map (int32-type)))))
+    (is (= num
+           (->> num
+                (to-bit-map (int32-type))
+                (from-bit-map (int32-type))))))
   (let [num 1254212]
-    (is (= num)
-        (->> num
-             (to-bit-map (int32-type))
-             to-binary
-             (from-bit-map (int32-type))))))
-
-
-
-(deftest very-bit-bit-set-test
-  (let [cap 800
-        s   (spec :first-field (bit-type (/ cap 8))
-                  :second-field (string-type 10))
-        b   (compose-buffer s)]
-    (let [v1
-          (interleave (repeat (/ cap 2) true) (repeat (/ cap 2) false))]
-      (set-field b :first-field v1)
-      (is (= v1
-             (get-field b :first-field))))))
+    (is (= num
+           (->> num
+                (to-bit-map (int32-type))
+                (from-bit-map (int32-type)))))))
