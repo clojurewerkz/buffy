@@ -318,7 +318,7 @@ And for wrapped buffer (that wraps the given byte array,
 ```clj
 (def my-spec (spec :first-field (int32-type)
                    :second-field (string-type 10)))
-(compose-buffer my-spec :buffer (java.nio.ByteBuffer/allocate 14))
+(compose-buffer my-spec :orig-buffer (java.nio.ByteBuffer/allocate 14))
 ```
 
 ## Dynamic Frames

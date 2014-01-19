@@ -4,7 +4,7 @@
             [clojurewerkz.buffy.frames :refer :all]
             [clojurewerkz.buffy.util :refer :all]
             [clojurewerkz.buffy.types.protocols :refer :all])
-  (:import [io.netty.buffer UnpooledByteBufAllocator ByteBufAllocator]))
+  (:import [io.netty.buffer Unpooled UnpooledByteBufAllocator ByteBufAllocator]))
 
 (def ^ByteBufAllocator allocator UnpooledByteBufAllocator/DEFAULT)
 
@@ -32,7 +32,7 @@
 (defn wrapped-buffer
   "Returns a buffer that wraps the given byte array, `j.nio.ByteBuffer` or netty `ByteBuf`"
   [orig-buffer]
-  (set-writer-index (.wrappedBuffer orig-buffer)))
+  (set-writer-index (Unpooled/wrappedBuffer orig-buffer)))
 
 (defprotocol Composable
   (decompose [this] [this buffer])
