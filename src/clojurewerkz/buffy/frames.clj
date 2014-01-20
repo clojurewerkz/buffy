@@ -36,7 +36,7 @@
      (let [[[f s] & more] tuples]
        (if (not (empty? more))
          (list 'let [f s] (make-decoder-bindings more types))
-         (list 'let [f s] (cons 'composite-frame types))))))
+         (list 'let [f s] (cons `composite-frame types))))))
 
 (defmacro frame-decoder
   [binding & tuples]
