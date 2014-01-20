@@ -310,6 +310,50 @@
       (set-field b :first-field v1)
       (is (= v1 (get-field b :first-field))))))
 
+(deftest bit-map-field-read-write-test
+  (let [s (spec :payload (bit-map-type :a 1 :b 2 :c 3 :d 4 :e 6))
+        b (compose-buffer s)
+        equivalent-regular-type (bit-type 2)]
+    (let [p {:a 2r0,
+             :b 2r00,
+             :c 2r000,
+             :d 2r0000,
+             :e 2r000000}]
+      (set-field b :payload p)
+      (is (= p (get-field b :payload)))
+      (is (= [false
+              false false
+              false false false
+              false false false false
+              false false false false false false]
+             (read equivalent-regular-type (.buf b) 0))))
+    (let [p {:a 2r1,
+             :b 2r11,
+             :c 2r111,
+             :d 2r1111,
+             :e 2r111111}]
+      (set-field b :payload p)
+      (is (= p (get-field b :payload)))
+      (is (= [true
+              true true
+              true true true
+              true true true true
+              true true true true true true]
+             (read equivalent-regular-type (.buf b) 0))))
+    (let [p {:a 2r1,
+             :b 2r11,
+             :c 2r101,
+             :d 2r1001,
+             :e 2r100100}]
+      (set-field b :payload p)
+      (is (= p (get-field b :payload)))
+      (is (= [true
+              true true
+              true false true
+              true false false true
+              true false false true false false]
+             (read equivalent-regular-type (.buf b) 0))))))
+
 (deftest wrapped-buffer-test
   (let [s (spec :first-field (int32-type)
                 :second-field (string-type 10))
