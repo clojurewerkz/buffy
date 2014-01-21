@@ -117,6 +117,7 @@
     (BuffyBuf. buffer indexes types positions)))
 
 (def bit-type     t/bit-type)
+(def bit-map-type t/bit-map-type)
 (def int32-type   t/int32-type)
 (def boolean-type t/boolean-type)
 (def byte-type    t/byte-type)
