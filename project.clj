@@ -7,7 +7,7 @@
                  [io.netty/netty-buffer "4.0.12.Final"]
                  [reiddraper/simple-check "0.5.3"]]
   :profiles {:1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}
-             :1.6 {:dependencies [[org.clojure/clojure "1.6.0-beta1"]]}
+             :1.6 {:dependencies [[org.clojure/clojure "1.6.0-beta2"]]}
              :dev {:resource-paths ["test/resources"]
                    :plugins [[codox "0.6.4"]]
                    :codox {:sources ["src/clojure"]
