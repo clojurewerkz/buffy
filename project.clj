@@ -12,4 +12,4 @@
                    :plugins [[codox "0.6.6"]]
                    :codox {:sources ["src/clojure"]
                            :output-dir "doc/api"}}}
-  :aliases {"all" ["with-profile" "dev:dev,1.4:dev"]})
+  :aliases {"all" ["with-profile" "dev:dev,1.4:dev,1.6:dev"]})
