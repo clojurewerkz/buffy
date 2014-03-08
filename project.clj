@@ -9,7 +9,7 @@
   :profiles {:1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}
              :1.6 {:dependencies [[org.clojure/clojure "1.6.0-beta2"]]}
              :dev {:resource-paths ["test/resources"]
-                   :plugins [[codox "0.6.4"]]
+                   :plugins [[codox 0.6.6]]
                    :codox {:sources ["src/clojure"]
                            :output-dir "doc/api"}}}
   :aliases {"all" ["with-profile" "dev:dev,1.4:dev"]})
