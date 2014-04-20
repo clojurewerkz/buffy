@@ -16,7 +16,7 @@ everything you would usually do with `ByteBuffer`.
 
 ## Project Maturity
 
-Buffy is __very__ young. Breaking API changes are not out of the
+Buffy is young. Breaking API changes are not out of the
 question before 1.0 release.
 
 
@@ -40,7 +40,7 @@ Maven, add the following repository definition to your `pom.xml`:
 With Leiningen:
 
 ```clj
-[clojurewerkz/buffy "1.0.0-beta3"]
+[clojurewerkz/buffy "1.0.0-beta4"]
 ```
 
 With Maven:
@@ -49,7 +49,7 @@ With Maven:
 <dependency>
   <groupId>clojurewerkz</groupId>
   <artifactId>buffy</artifactId>
-  <version>1.0.0-beta3</version>
+  <version>1.0.0-beta4</version>
 </dependency>
 ```
 
