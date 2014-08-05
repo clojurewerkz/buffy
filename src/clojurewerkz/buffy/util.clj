@@ -47,6 +47,7 @@
        (if (> first-non-empty 0)
          (let [ba (byte-array (- (inc first-non-empty) idx))]
            (read-bytes-fn buffer idx ba)
+           (when rewind? (.readerIndex buffer (+ idx size)))
            ba)
          (byte-array 0)))))
 
