@@ -444,35 +444,4 @@
           (rewind-write type b sample))
         (rewind-until-end b)
         (doseq [sample samples]
-          (is (= sample (rewind-read type b))))
-
-        )
-
-      )
-    (comment
-
-      (let [int-t    (int32-type)
-            b        (direct-buffer 20)]
-        (reset-writer-index b)
-        (rewind-write int-t b 1)
-        (rewind-write int-t b 100)
-        (rewind-write int-t b 1000)
-        (rewind-until-end b)
-        (is (= 1 (rewind-read int-t b)))
-        (is (= 100 (rewind-read int-t b)))
-        (is (= 1000 (rewind-read int-t b)))
-        )
-
-      (testing "Rewind-read and write strings"
-        (let [int-t    (int32-type)
-              string-t (string-type 10)
-              b        (direct-buffer 20)]
-          (reset-writer-index b)
-          (rewind-write int-t b 1)
-          (rewind-write string-t b "abcdefg")
-          (rewind-until-end b)
-          (is (= 1 (rewind-read int-t b)))
-          (is (= "abcdefg" (rewind-read string-t b)))
-          )))
-    )
-)
+          (is (= sample (rewind-read type b))))))))
