@@ -87,6 +87,8 @@
     (set-field b :first-field (float 5.34))
     (is (= (float 5.34) (get-field b :first-field)))))
 
+
+
 (deftest string-field-write-test
   (let [s (spec :first-field (int32-type)
                 :second-field (string-type 10))
@@ -220,8 +222,8 @@
         b (compose-buffer s)]
 
     (compose b {:first-field 101
-                   :second-field "string"
-                   :third-field true})
+                :second-field "string"
+                :third-field true})
     (is (= {:third-field true :second-field "string" :first-field 101}
            (decompose b)))))
 
@@ -425,6 +427,30 @@
 
 (deftest rewinding-write-read-tests
   (testing "Rewind-read and write ints"
+    (doseq [[type samples] {(int32-type)     [100 1001 10001]
+                            (boolean-type)   [true, false]
+                            (byte-type)      [10 11 12]
+                            (short-type)     [100 1001 10001]
+                            (long-type)      [100 1001 10001]
+                            (medium-type)    [100 1001 10001]
+                            (float-type)     [100.0 1001.0 10001.0]
+                            (double-type)    [100.0 1001.0 10001.0]
+                            ;; (bytes-type 10)  [(.getBytes "abcdef") (.getBytes "cfdegh")]
+                            (string-type 10) ["abcdef" "cfdegh"]
+                            }]
+      (let [b (direct-buffer (* (size type) (count samples)))]
+        (reset-writer-index b)
+        (doseq [sample samples]
+          (rewind-write type b sample))
+        (rewind-until-end b)
+        (doseq [sample samples]
+          (is (= sample (rewind-read type b))))
+
+        )
+
+      )
+    (comment
+
       (let [int-t    (int32-type)
             b        (direct-buffer 20)]
         (reset-writer-index b)
@@ -435,17 +461,18 @@
         (is (= 1 (rewind-read int-t b)))
         (is (= 100 (rewind-read int-t b)))
         (is (= 1000 (rewind-read int-t b)))
-        ))
+        )
 
-  (testing "Rewind-read and write strings"
-      (let [int-t    (int32-type)
-            string-t (string-type 10)
-            b        (direct-buffer 20)]
-        (reset-writer-index b)
-        (rewind-write int-t b 1)
-        (rewind-write string-t b "abcdefg")
-        (rewind-until-end b)
-        (is (= 1 (rewind-read int-t b)))
-        (is (= "abcdefg" (rewind-read string-t b)))
-        ))
-  )
+      (testing "Rewind-read and write strings"
+        (let [int-t    (int32-type)
+              string-t (string-type 10)
+              b        (direct-buffer 20)]
+          (reset-writer-index b)
+          (rewind-write int-t b 1)
+          (rewind-write string-t b "abcdefg")
+          (rewind-until-end b)
+          (is (= 1 (rewind-read int-t b)))
+          (is (= "abcdefg" (rewind-read string-t b)))
+          )))
+    )
+)
