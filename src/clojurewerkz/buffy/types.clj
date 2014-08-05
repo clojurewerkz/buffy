@@ -26,6 +26,11 @@
   (read [by buffer idx]
     (.getInt buffer idx))
 
+  (rewind-write [bt buffer value]
+    (.writeInt buffer value))
+  (rewind-read [by buffer]
+    (.readInt buffer))
+
   Object
   (toString [_]
     "Int32Type"))
@@ -37,6 +42,12 @@
     (.setBoolean buffer idx value))
   (read [by buffer idx]
     (.getBoolean buffer idx))
+
+  (rewind-write [bt buffer value]
+    (.writeBoolean buffer value))
+  (rewind-read [by buffer]
+    (.readBoolean buffer))
+
 
   Object
   (toString [_]
@@ -50,6 +61,11 @@
   (read [by buffer idx]
     (.getByte buffer idx))
 
+  (rewind-write [bt buffer value]
+    (.writeByte buffer value))
+  (rewind-read [by buffer]
+    (.readByte buffer))
+
   Object
   (toString [_]
     "ByteType"))
@@ -62,6 +78,11 @@
   (read [by buffer idx]
     (.getShort buffer idx))
 
+  (rewind-write [bt buffer value]
+    (.writeShort buffer value))
+  (rewind-read [by buffer]
+    (.readShort buffer))
+
   Object
   (toString [_]
     "ShortType"))
@@ -73,6 +94,11 @@
     (.setMedium buffer idx value))
   (read [by buffer idx]
     (.getMedium buffer idx))
+
+  (rewind-write [bt buffer value]
+    (.writeMedium buffer value))
+  (rewind-read [by buffer]
+    (.readMedium buffer))
 
   Object
   (toString [_]
@@ -103,6 +129,12 @@
                     current-val (.getByte buffer idx)]
                 (map #(bit-test current-val %) (range 0 8))))))
 
+
+  (rewind-write [bt buffer value]
+    (throw (Exception. "Don't know how to rewind-write a bit type")))
+  (rewind-read  [bt buffer]
+    (throw (Exception. "Don't know how to rewind-read a bit type")))
+
   Object
   (toString [_]
     (str "Bit Type: " byte-length)))
@@ -127,19 +159,19 @@
 
 (defn- bit-map-bits->long [bits]
   (reduce (fn [accu x] (+ (bit-shift-left accu 1)
-                          (if x 1 0)))
+                         (if x 1 0)))
           (long 0)
           bits))
 
 (defn- bit-map-bits->hash-map [bits fields]
-    (first
-     (reduce
-      (fn [[out remaining] [field-name field-length]]
-        [(assoc out field-name
-                (bit-map-bits->long (take field-length remaining)))
-         (drop field-length remaining)])
-      [{} bits]
-      fields)))
+  (first
+   (reduce
+    (fn [[out remaining] [field-name field-length]]
+      [(assoc out field-name
+              (bit-map-bits->long (take field-length remaining)))
+       (drop field-length remaining)])
+    [{} bits]
+    fields)))
 
 (deftype BitMapType [inner-bits fields]
   BuffyType
@@ -149,8 +181,17 @@
           bit-indexes   (reverse (range (* 8 (size inner-bits))))]
       (write inner-bits buffer idx
              (mapv #(bit-test bit-map-value %) bit-indexes))))
+
   (read [by buffer idx]
-    (bit-map-bits->hash-map (read inner-bits buffer idx) fields)))
+    (bit-map-bits->hash-map (read inner-bits buffer idx) fields))
+
+
+  (rewind-write [bt buffer value]
+    (throw (Exception. "Don't know how to rewind-write a bit map type")))
+  (rewind-read  [bt buffer]
+    (throw (Exception. "Don't know how to rewind-read a bit map type")))
+
+  )
 
 (deftype FloatType []
   BuffyType
@@ -159,6 +200,11 @@
     (.setFloat buffer idx value))
   (read [by buffer idx]
     (.getFloat buffer idx))
+
+  (rewind-write [bt buffer value]
+    (.writeFloat buffer value))
+  (rewind-read [by buffer]
+    (.readFloat buffer))
 
   Object
   (toString [_]
@@ -172,6 +218,11 @@
   (read [by buffer idx]
     (.getLong buffer idx))
 
+  (rewind-write [bt buffer value]
+    (.writeLong buffer value))
+  (rewind-read [by buffer]
+    (.readLong buffer))
+
   Object
   (toString [_]
     "LongType"))
@@ -184,6 +235,12 @@
     (zero-fill-till-end buffer idx (count value) (.size bt)))
   (read [bt buffer idx]
     (read-nonempty-bytes buffer idx (.size bt)))
+
+  (rewind-write [bt buffer value]
+    (.writeBytes buffer value)
+    (zero-fill-till-end buffer (count value) (.size bt)))
+  (rewind-read [bt buffer]
+    (read-nonempty-bytes buffer (.size bt)))
 
   Object
   (toString [_]
@@ -200,6 +257,15 @@
     (String.
      (read-nonempty-bytes buffer idx (.size bt))))
 
+  (rewind-write [bt buffer value]
+    ;; TODO assert
+    (.writeBytes buffer (.getBytes value))
+    (zero-fill-till-end buffer (count value) size))
+  (rewind-read [bt buffer]
+    (String.
+     (read-nonempty-bytes buffer (.size bt))))
+
+
   Object
   (toString [_]
     (str "StringType (" size ")")))
@@ -211,10 +277,17 @@
 (deftype EnumType [item-type mappings reverse-mappings]
   BuffyType
   (size [_] (size item-type))
+
   (write [bt buffer idx value]
     (.write item-type buffer idx (get mappings value)))
   (read [bt buffer idx]
     (let [intermediate (.read item-type buffer idx)]
+      (get reverse-mappings intermediate)))
+
+  (rewind-write [bt buffer value]
+    (.rewind-write item-type buffer (get mappings value)))
+  (rewind-read [bt buffer]
+    (let [intermediate (.rewind-read item-type buffer)]
       (get reverse-mappings intermediate))))
 
 (deftype CompositeType [types]
@@ -229,6 +302,15 @@
           (for [[type position] (map vector types (positions types))]
             (.read type buffer (+ idx position)))))
 
+  (rewind-write [bt buffer values]
+    (assert (= (count types) (count values)) "Number of values passed to composite should equal number of types")
+    (doseq [[type value] (map vector types values)]
+      (.rewind-write type buffer value)))
+  (rewind-read [bt buffer]
+    (into []
+          (for [type types]
+            (.rewind-read type buffer))))
+
   Object
   (toString [_]
     (str "CompositeType: (" (clojure.string/join ", " (mapv str types)) ")")))
@@ -236,6 +318,7 @@
 (deftype RepeatedType [type times]
   BuffyType
   (size [_] (* (.size type) times))
+
   (write [bt buffer idx values]
     (doseq [[value position] (map vector values (positions (repeat (count values) type)))]
       (.write type buffer (+ idx position) value))
@@ -245,14 +328,26 @@
   (read [bt buffer idx]
     (into []
           (for [position (positions (repeat times type))]
-            (.read type buffer (+ idx position))))))
+            (.read type buffer (+ idx position)))))
+
+
+  (rewind-write [bt buffer values]
+    (doseq [value values]
+      (.rewind-write type buffer value))
+    ;; buffer idx size expected-size
+    (zero-fill-till-end buffer (dec (* (.size type) (-> values count inc))) (.size bt)))
+
+  (rewind-read [bt buffer]
+    (into []
+          (for [idx (range times)]
+            (.rewind-read type buffer)))))
 
 
 ;;
 ;; Constructors
 ;;
 
-(def bit-type   (memoize (fn [length]  (BitType. length))))
+(def bit-type     (memoize (fn [length] (BitType. length))))
 (def int32-type   (memoize #(Int32Type.)))
 (def boolean-type (memoize #(BooleanType.)))
 (def byte-type    (memoize #(ByteType.)))
@@ -263,6 +358,7 @@
 (def long-type    (memoize #(LongType.)))
 (def string-type  (memoize (fn [length] (StringType. length))))
 (def bytes-type   (memoize (fn [length] (BytesType. length))))
+
 (def bit-map-type
   (memoize
    (fn [& fields]

@@ -21,23 +21,34 @@
    types 0))
 
 (defn zero-fill-till-end
-  [buffer idx size expected-size]
-  (when (< size expected-size)
-    (.setZero buffer (+ idx size) (- expected-size size))))
+  ([buffer size expected-size]
+     (when (< size expected-size)
+       (.writeZero buffer (- expected-size size))))
+  ([buffer idx size expected-size]
+     (when (< size expected-size)
+       (.setZero buffer (+ idx size) (- expected-size size)))))
 
 (defn read-nonempty-bytes
-  [buffer idx size]
-  (let [first-non-empty (or
-                         (->> (range idx (+ idx size))
-                              reverse
-                              (filter #(not (= 0 (.getByte buffer %))))
-                              first)
-                         0)]
-    (if (> first-non-empty 0)
-      (let [ba (byte-array (- (inc first-non-empty) idx))]
-        (.getBytes buffer idx ba)
-        ba)
-      (byte-array 0))))
+  ([buffer size]
+     (read-nonempty-bytes buffer (.readerIndex buffer) size true))
+  ([buffer idx size]
+     (read-nonempty-bytes buffer idx size false))
+  ([buffer idx size rewind?]
+     (let [read-byte-fn    (fn [buffer idx] (.getByte buffer idx))
+           read-bytes-fn   (if rewind?
+                             (fn [buffer _   ba] (.readBytes buffer ba))
+                             (fn [buffer idx ba] (.getBytes buffer idx ba)))
+           first-non-empty (or
+                            (->> (range idx (+ idx size))
+                                 reverse
+                                 (filter #(not (= 0 (read-byte-fn buffer %))))
+                                 first)
+                            0)]
+       (if (> first-non-empty 0)
+         (let [ba (byte-array (- (inc first-non-empty) idx))]
+           (read-bytes-fn buffer idx ba)
+           ba)
+         (byte-array 0)))))
 
 ;;
 ;; Hexdumps
@@ -87,8 +98,8 @@
                                         (= 0 (mod i 32))       ""
                                         (and (= 1 (quot i 16))
                                              (= 0 (mod i 16))) "  "
-                                        (= 0 (mod i 2))        " "
-                                        :else                  ""))))
+                                             (= 0 (mod i 2))        " "
+                                             :else                  ""))))
                    flatten
                    j)))))
 
