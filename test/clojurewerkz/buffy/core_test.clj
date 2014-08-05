@@ -8,7 +8,7 @@
             [simple-check.generators :as gen]
             [simple-check.properties :as prop]))
 
-(def quickcheck-iterations 1000)
+(def quickcheck-iterations 10)
 
 (deftest size-test
   (is (= 4 (size (int32-type))))
@@ -311,8 +311,8 @@
       (is (= v1 (get-field b :first-field))))))
 
 (deftest bit-map-field-read-write-test
-  (let [s (spec :payload (bit-map-type :a 1 :b 2 :c 3 :d 4 :e 6))
-        b (compose-buffer s)
+  (let [s                       (spec :payload (bit-map-type :a 1 :b 2 :c 3 :d 4 :e 6))
+        b                       (compose-buffer s)
         equivalent-regular-type (bit-type 2)]
     (let [p {:a 2r0,
              :b 2r00,
@@ -422,3 +422,30 @@
       (set-field b :first-field v1)
       (is (= v1
              (get-field b :first-field))))))
+
+(deftest rewinding-write-read-tests
+  (testing "Rewind-read and write ints"
+      (let [int-t    (int32-type)
+            b        (direct-buffer 20)]
+        (reset-writer-index b)
+        (rewind-write int-t b 1)
+        (rewind-write int-t b 100)
+        (rewind-write int-t b 1000)
+        (rewind-until-end b)
+        (is (= 1 (rewind-read int-t b)))
+        (is (= 100 (rewind-read int-t b)))
+        (is (= 1000 (rewind-read int-t b)))
+        ))
+
+  (testing "Rewind-read and write strings"
+      (let [int-t    (int32-type)
+            string-t (string-type 10)
+            b        (direct-buffer 20)]
+        (reset-writer-index b)
+        (rewind-write int-t b 1)
+        (rewind-write string-t b "abcdefg")
+        (rewind-until-end b)
+        (is (= 1 (rewind-read int-t b)))
+        (is (= "abcdefg" (rewind-read string-t b)))
+        ))
+  )

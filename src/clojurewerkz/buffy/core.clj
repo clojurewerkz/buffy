@@ -9,39 +9,51 @@
 
 (ns clojurewerkz.buffy.core
   (:refer-clojure :exclude [read])
-  (:require [clojurewerkz.buffy.types :as t]
-            [clojurewerkz.buffy.frames :refer :all]
-            [clojurewerkz.buffy.util :refer :all]
+  (:require [clojurewerkz.buffy.types           :as t]
+            [clojurewerkz.buffy.frames          :refer :all]
+            [clojurewerkz.buffy.util            :refer :all]
             [clojurewerkz.buffy.types.protocols :refer :all])
   (:import [io.netty.buffer Unpooled UnpooledByteBufAllocator ByteBufAllocator]))
 
 (def ^ByteBufAllocator allocator UnpooledByteBufAllocator/DEFAULT)
 
-(defn- set-writer-index
+(defn reset-writer-index
+  [buf]
+  (.resetWriterIndex buf)
+  buf)
+
+(defn reset-reader-index
+  [buf]
+  (.resetReaderIndex buf)
+  buf)
+
+(def reset-indexes (comp reset-reader-index reset-writer-index))
+
+(defn rewind-until-end
   [buf]
   (.writerIndex buf (.capacity buf))
   buf)
 
 (defn heap-buffer
   ([]
-     (set-writer-index (.heapBuffer allocator)))
+     (rewind-until-end (.heapBuffer allocator)))
   ([^long initial-capacity]
-     (set-writer-index (.heapBuffer allocator initial-capacity initial-capacity)))
+     (rewind-until-end (.heapBuffer allocator initial-capacity initial-capacity)))
   ([^long initial-capacity ^long max-capacity]
-     (set-writer-index (.heapBuffer allocator initial-capacity max-capacity))))
+     (rewind-until-end (.heapBuffer allocator initial-capacity max-capacity))))
 
 (defn direct-buffer
   ([]
-     (set-writer-index (.directBuffer allocator)))
+     (rewind-until-end (.directBuffer allocator)))
   ([^long initial-capacity]
-     (set-writer-index (.directBuffer allocator initial-capacity initial-capacity)))
+     (rewind-until-end (.directBuffer allocator initial-capacity initial-capacity)))
   ([^long initial-capacity ^long max-capacity]
-     (set-writer-index (.directBuffer allocator initial-capacity max-capacity))))
+     (rewind-until-end (.directBuffer allocator initial-capacity max-capacity))))
 
 (defn wrapped-buffer
   "Returns a buffer that wraps the given byte array, `j.nio.ByteBuffer` or netty `ByteBuf`"
   [orig-buffer]
-  (set-writer-index (Unpooled/wrappedBuffer orig-buffer)))
+  (rewind-until-end (Unpooled/wrappedBuffer orig-buffer)))
 
 (defprotocol Composable
   (decompose [this] [this buffer])

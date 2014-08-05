@@ -15,6 +15,9 @@
 ;;
 
 (defprotocol BuffyType
-  (size [bt])
-  (write [bt buffer idx value])
-  (read [bt buffer idx]))
+  (size         [bt] "Return size of the data type")
+  (write        [bt buffer idx value] "Relative write")
+  (read         [bt buffer idx] "Relative read")
+  (rewind-write [bt buffer value] "Writes at current writer position, rewinds writer index to the last written position.")
+  (rewind-read  [bt buffer] "Reads value at current reader position, rewinds reader index to the end of current read value.")
+  )
