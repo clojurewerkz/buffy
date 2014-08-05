@@ -210,6 +210,23 @@
   (toString [_]
     "FloatType"))
 
+(deftype DoubleType []
+  BuffyType
+  (size [_] 8)
+  (write [bt buffer idx value]
+    (.setDouble buffer idx value))
+  (read [by buffer idx]
+    (.getDouble buffer idx))
+
+  (rewind-write [bt buffer value]
+    (.writeDouble buffer value))
+  (rewind-read [by buffer]
+    (.readDouble buffer))
+
+  Object
+  (toString [_]
+    "DoubleType"))
+
 (deftype LongType []
   BuffyType
   (size [_] 8)
