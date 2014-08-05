@@ -372,6 +372,7 @@
 (def medium-type  (memoize #(MediumType.)))
 ;; TODO: Add unsigned types: byte, int, medium, short
 (def float-type   (memoize #(FloatType.)))
+(def double-type  (memoize #(DoubleType.)))
 (def long-type    (memoize #(LongType.)))
 (def string-type  (memoize (fn [length] (StringType. length))))
 (def bytes-type   (memoize (fn [length] (BytesType. length))))
