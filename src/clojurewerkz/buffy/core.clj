@@ -146,6 +146,7 @@
 (def medium-type  t/medium-type)
 ;; TODO: Add unsigned types: byte, int, medium, short
 (def float-type   t/float-type)
+(def double-type  t/double-type)
 (def long-type    t/long-type)
 (def string-type  t/string-type)
 (def bytes-type   t/bytes-type)
