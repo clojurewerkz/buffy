@@ -434,3 +434,9 @@
         (rewind-until-end b)
         (doseq [sample samples]
           (is (= sample (rewind-read type b))))))))
+
+(deftest single-byte-test
+  (let [ba  (byte-array [1 0 0 0])
+        s   (spec :ba (bytes-type 4))
+        buf (compose-buffer s :orig-buffer (java.nio.ByteBuffer/wrap ba))]
+    (is (= [1] (vec (get-field buf :ba))))))
