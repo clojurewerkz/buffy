@@ -65,7 +65,7 @@ Require Buffy's main namespace:
 Buffy creates buffers from a spec you specify. The spec consists of
 one or more fields of known data types, for example:
 
-```clj
+```clojure
 (spec :my-field-1 (int32-type)
       :my-field-2 (string-type 10))
 ```
@@ -86,7 +86,7 @@ long and second one 14:
 
 Now you can use this specification to create a byte buffer:
 
-```clj
+```clojure
 (compose-buffer (spec :my-field-1 (int32-type) :my-field-2 (string-type 10)))
 ;= a byte buffer
 ```
@@ -103,7 +103,7 @@ payload.
 
 Here's an example:
 
-```clj
+```clojure
 (ns my-binary-project.core
   (:require [clojurewerkz.buffy.core :refer :all]))
 
@@ -126,7 +126,7 @@ Here's an example:
 
 You can also serialize and deserialize a complete buffer:
 
-```clj
+```clojure
 
 (let [s     (spec :first-field (int32-type)
                   :second-field (string-type 10)
@@ -163,7 +163,7 @@ Built-in data types are:
 
 In order to construct a `string-type`, specify its length:
 
-```clj
+```clojure
 (string-type 15)
 ```
 
@@ -172,7 +172,7 @@ In order to construct a `string-type`, specify its length:
 Same is true for `BytesType`, when constructing it, just pass a number of bytes it should
 contain:
 
-```clj
+```clojure
 (bytes-type 25)
 ```
 
@@ -180,7 +180,7 @@ contain:
 
 Bit type is `n` bits long sequence of bits that are turned either on or off, for example,
 
-```clj
+```clojure
 [true true false false
  false false false false
  false false false false
@@ -201,7 +201,7 @@ Which translates to decimal `3`, that is stored in a 4-bits integer field.
 
 There are some helper functions, such as:
 
-```clj
+```clojure
 (clojurewerkz.buffy.util/bits-on-at [0 1 2])
 
 [true true true false
@@ -222,7 +222,7 @@ Also, `on-bits-indexes` that returns positions at which bits are set, and
 In order to use bit type, you need to give it a 32-items long sequence of
 truthy or fasly falues:
 
-```clj
+```clojure
 (let [s (spec :first-field (bit-type 4) ;; Bit field that fills 4 bytes
               :second-field (string-type 10))
       buf (compose-buffer s)]
@@ -247,14 +247,14 @@ sequentially:
 Here's what composite type consisting of `int` and 10 characters long
 `string` would look like:
 
-```clj
+```clojure
 (composite-type (int32-type) (string-type 10))
 ```
 
 `repeated-type` repeats a type one or more times.  Repeated types is
 used when you need to have many fields of same size:
 
-```clj
+```clojure
 (repeated-type (string-type 10) 5)
 ```
 
@@ -262,7 +262,7 @@ will produce a type consisting of 5 `strings` of length 10.
 
 It's possible to combine `repeated-type` and `composite-type`:
 
-```clj
+```clojure
 (repeated-type (composite-type (int32-type) (string-type 10)) 5)
 ```
 
@@ -275,20 +275,20 @@ repeated 5 times.
 Consider a binary protocol where the `STARTUP` verb is encoded as a
 long value of `0x01` and the `QUERY` verb is encoded as `0x07`:
 
-```clj
+```clojure
 (enum-type (long-type) {:STARTUP 0x02 :QUERY 0x07})
 ```
 
 With this enum type, it is possible to set a field using `:STARTUP`
 and `:QUERY` keywords:
 
-```clj
+```clojure
 (set-field buffer :payload-type :STARTUP)
 ```
 
 When reading a field, its symbolic representation is returned:
 
-```clj
+```clojure
 (get-field buffer :payload-type)
 ;; => :QUERY
 ```
@@ -298,7 +298,7 @@ When reading a field, its symbolic representation is returned:
 Currently, Buffy supports `direct`, `heap` and `wrapped` buffers.
 In order to create a heap buffer:
 
-```clj
+```clojure
 (def my-spec (spec :first-field (int32-type)
                    :second-field (string-type 10)))
 (compose-buffer my-spec :buffer-type :heap)
@@ -306,7 +306,7 @@ In order to create a heap buffer:
 
 For off-heap (direct) buffer:
 
-```clj
+```clojure
 (def my-spec (spec :first-field (int32-type)
                    :second-field (string-type 10)))
 (compose-buffer my-spec :buffer-type :direct)
@@ -315,7 +315,7 @@ For off-heap (direct) buffer:
 And for wrapped buffer (that wraps the given byte array,
 `j.nio.ByteBuffer` or netty `ByteBuf`):
 
-```clj
+```clojure
 (def my-spec (spec :first-field (int32-type)
                    :second-field (string-type 10)))
 (compose-buffer my-spec :orig-buffer (java.nio.ByteBuffer/allocate 14))
@@ -327,7 +327,7 @@ If you're working with sophisticated protocols, more often than not you can't kn
 the buffer size before you construct an entire type. One of the most primitive examples
 is `netstrings` protocol, that consists of
 
-```clj
+```clojure
 (short-type) ;; Identifies the length of string
 (string-type 10) ;; Identifies the string itself
 ```
@@ -339,7 +339,7 @@ encoder and decoder. Let's take a closer look at netstrings protocol implementat
 
 First, encoder:
 
-```clj
+```clojure
 (frame-encoder [value]
                ;; Name     ;; Child frame or type      ;; Dynamic value
                length      (short-type)                (count value)
@@ -353,7 +353,7 @@ Next off, the `string` itself, that is a `string-type` and holds a `value` itsel
 
 Decoder is written in a same manner:
 
-```clj
+```clojure
 (frame-decoder [buffer offset]
                length (short-type)
                string (string-type (read length buffer offset)))
@@ -367,7 +367,7 @@ So, `string` type is constructed by reading off the `length` as a first field of
 
 An entire frame would look as follows:
 
-```clj
+```clojure
 (def dynamic-string-payload
   (dynamic-buffer
    (frame-type
@@ -387,7 +387,7 @@ we should discard it and take only second value, which is a string itself.
 
 In order to compose/decompose it, you should use `compose` and `decompose` functions:
 
-```clj
+```clojure
 (compose dynamic-string-payload ["super-duper-random-string" "long-ans-senseless-stringyoyoyo"])
 ```
 
@@ -410,7 +410,7 @@ Where each `<string>` is actually
 It's implementation is a little bit more complex, but still reasonably simple. First, we
 define a dynamic string frame in the same manner as we made with `netstrings`:
 
-```clj
+```clojure
 (def dynamic-string
   (frame-type
    (frame-encoder [value]
@@ -425,7 +425,7 @@ define a dynamic string frame in the same manner as we made with `netstrings`:
 
 Next off, key-value pairs. Each one of them is nothing more than a string repeated twice.
 
-```clj
+```clojure
 (def key-value-pair
   (composite-frame
    dynamic-string
@@ -435,7 +435,7 @@ Next off, key-value pairs. Each one of them is nothing more than a string repeat
 Next is dynamic map, which is a frame type that holds a `length` which is `short-type` and
 `repeated-frame` of `key-value-pairs`:
 
-```clj
+```clojure
 (def dynamic-map
   (frame-type
    (frame-encoder [value]
@@ -449,7 +449,7 @@ Next is dynamic map, which is a frame type that holds a `length` which is `short
 
 Now, our dynamic map is ready for composition and decomposition:
 
-```clj
+```clojure
 (let [dynamic-type (dynamic-buffer dynamic-map)]
   (compose dynamic-type [[["key1" "value1"] ["key1" "value1"] ["key1" "value1"]]]) ;; Returns a constructred buffer
 
@@ -465,7 +465,7 @@ we've added some wrapper functions for existing types, that may
 represent your values as series of 1s and 0es. For example, you can
 convert an integer `101` to it's binary representation:
 
-```clj
+```clojure
 (to-bit-map (int32-type) 101)
 ```
 
