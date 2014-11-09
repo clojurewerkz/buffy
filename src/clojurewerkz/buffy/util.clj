@@ -34,20 +34,17 @@
   ([buffer idx size]
      (read-nonempty-bytes buffer idx size false))
   ([buffer idx size rewind?]
-     (let [read-byte-fn    (fn [buffer idx] (.getByte buffer idx))
-           read-bytes-fn   (if rewind?
-                             (fn [buffer _   ba] (.readBytes buffer ba))
-                             (fn [buffer idx ba] (.getBytes buffer idx ba)))
-           first-non-empty (or
+     (let [first-non-empty (or
                             (->> (range idx (+ idx size))
                                  reverse
-                                 (filter #(not (= 0 (read-byte-fn buffer %))))
+                                 (filter #(not (= 0 (.getByte buffer %))))
                                  first)
-                            0)]
-       (if (> first-non-empty 0)
+                            -1)]
+       (if (>= first-non-empty 0)
          (let [ba (byte-array (- (inc first-non-empty) idx))]
-           (read-bytes-fn buffer idx ba)
-           (when rewind? (.readerIndex buffer (+ idx size)))
+           (.getBytes buffer idx ba)
+           (when rewind?
+             (.readerIndex buffer (+ idx size)))
            ba)
          (byte-array 0)))))
 
