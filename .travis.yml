@@ -4,6 +4,7 @@ script: lein2 all test
 jdk:
   - openjdk7
   - oraclejdk7
+  - oraclejdk8
 sudo: false
 cache:
   directories:
