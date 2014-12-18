@@ -5,9 +5,9 @@
             [clojurewerkz.buffy.core :refer :all]
             [clojurewerkz.buffy.frames :refer :all]
             [clojurewerkz.buffy.types.protocols :refer :all]
-            [simple-check.core :as sc]
-            [simple-check.generators :as gen]
-            [simple-check.properties :as prop]))
+            [clojure.test.check :as sc]
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :as prop]))
 
 (deftest dynamic-roundtrip-test
   (let [string-encoder (frame-encoder [value]
