@@ -515,10 +515,10 @@ Buffy requires Clojure 1.4+.
 
 Buffy is part of the [group of Clojure libraries known as ClojureWerkz](http://clojurewerkz.org), together with
 
- * [Monger](http://clojuremongodb.info)
  * [Langohr](http://clojurerabbitmq.info)
  * [Elastisch](http://clojureelasticsearch.info)
  * [Cassaforte](http://clojurecassandra.info)
+ * [Monger](http://clojuremongodb.info)
  * [Titanium](http://titanium.clojurewerkz.org)
  * [Neocons](http://clojureneo4j.info)
  * [Quartzite](http://clojurequartz.info)
