@@ -1,4 +1,4 @@
-(defproject clojurewerkz/buffy "1.0.0-beta6-SNAPSHOT"
+(defproject clojurewerkz/buffy "1.0.0"
   :description "Clojure library for working with binary data"
   :url "http://github.com/clojurewerkz/buffy"
   :license {:name "Eclipse Public License"
