@@ -159,7 +159,7 @@ Built-in data types are:
 
 ### Arbitrary-length types
 
-  * `string-type` - arbitrary size `string` (you define length yourself).
+  * `string-type` - arbitrary size `string` (you define the length).
 
 In order to construct a `string-type`, specify its length:
 
