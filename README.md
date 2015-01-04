@@ -74,7 +74,7 @@ The spec can be a map (e.g. `array-map`) or avector of vectors.
 Avoid using hash maps, since they are unordered.
 
 Below is a specification for a buffer containing 2 fields, one 4 bytes
-long and second one 14:
+long and second one 10:
 
 ```
 0            4                         14
