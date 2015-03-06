@@ -364,6 +364,27 @@
           (for [idx (range times)]
             (.rewind-read type buffer)))))
 
+(deftype UUIDType []
+  BuffyType
+  (size [_] 16)
+
+  (read [by buffer idx]
+    (let [msb (.getLong buffer idx)
+          lsb (.getLong buffer (+ idx 8))]
+      (java.util.UUID. lsb msb)))
+
+  (rewind-write [bt buffer value]
+    (.writeLong buffer (.getMostSignificantBits value))
+    (.writeLong buffer (.getLeastSignificantBits value)))
+
+  (write [bt buffer idx value]
+    (.setLong buffer idx       (.getMostSignificantBits value))
+    (.setLong buffer (+ 8 idx) (.getLeastSignificantBits value)))
+
+  Object
+  (toString [_]
+    "UUIDType"))
+
 
 ;;
 ;; Constructors
@@ -381,6 +402,7 @@
 (def long-type    (memoize #(LongType.)))
 (def string-type  (memoize (fn [length] (StringType. length))))
 (def bytes-type   (memoize (fn [length] (BytesType. length))))
+(def uuid-type    (memoize #(UUIDType.)))
 
 (def bit-map-type
   (memoize

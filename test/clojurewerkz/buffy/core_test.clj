@@ -111,6 +111,13 @@
     (set-field b :second-field (.getBytes ""))
     (is (empty? (String. (get-field b :second-field))))))
 
+(deftest uuid-field-test
+  (let [s (spec :first-field  (uuid-type))
+        b (compose-buffer s)
+        uuid (java.util.UUID/randomUUID)]
+    (set-field b :first-field uuid)
+    (is (= uuid (get-field b :first-field)))))
+
 (defmacro get-set-generative
   [generator b f]
   `(:result
