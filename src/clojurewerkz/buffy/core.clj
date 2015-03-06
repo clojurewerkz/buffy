@@ -142,23 +142,23 @@
         positions  (positions types)]
     (BuffyBuf. buffer indexes types positions)))
 
-(def bit-type     t/bit-type)
-(def bit-map-type t/bit-map-type)
-(def int32-type   t/int32-type)
-(def boolean-type t/boolean-type)
-(def byte-type    t/byte-type)
-(def short-type   t/short-type)
-(def medium-type  t/medium-type)
+(def bit-type       t/bit-type)
+(def bit-map-type   t/bit-map-type)
+(def int32-type     t/int32-type)
+(def boolean-type   t/boolean-type)
+(def byte-type      t/byte-type)
+(def short-type     t/short-type)
+(def medium-type    t/medium-type)
 ;; TODO: Add unsigned types: byte, int, medium, short
-(def float-type   t/float-type)
-(def double-type  t/double-type)
-(def long-type    t/long-type)
-(def string-type  t/string-type)
-(def bytes-type   t/bytes-type)
+(def float-type     t/float-type)
+(def double-type    t/double-type)
+(def long-type      t/long-type)
+(def string-type    t/string-type)
+(def bytes-type     t/bytes-type)
 (def composite-type t/composite-type)
 (def repeated-type  t/repeated-type)
-(def enum-type  t/enum-type)
-(def uuid-type  t/uuid-type)
+(def enum-type      t/enum-type)
+(def uuid-type      t/uuid-type)
 
 (defn to-bit-map
   "Converts given value to vector of `true`/`false`, which represent on
