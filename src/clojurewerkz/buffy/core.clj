@@ -158,6 +158,7 @@
 (def composite-type t/composite-type)
 (def repeated-type  t/repeated-type)
 (def enum-type  t/enum-type)
+(def uuid-type  t/uuid-type)
 
 (defn to-bit-map
   "Converts given value to vector of `true`/`false`, which represent on
