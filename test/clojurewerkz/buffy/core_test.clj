@@ -112,10 +112,11 @@
     (is (empty? (String. (get-field b :second-field))))))
 
 (deftest uuid-field-test
-  (let [s (spec :first-field  (uuid-type))
-        b (compose-buffer s)
+  (let [s    (spec :first-field  (uuid-type))
+        b    (compose-buffer s)
         uuid (java.util.UUID/randomUUID)]
     (set-field b :first-field uuid)
+    (println uuid (get-field b :first-field))
     (is (= uuid (get-field b :first-field)))))
 
 (defmacro get-set-generative

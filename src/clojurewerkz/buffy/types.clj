@@ -371,15 +371,20 @@
   (read [by buffer idx]
     (let [msb (.getLong buffer idx)
           lsb (.getLong buffer (+ idx 8))]
-      (java.util.UUID. lsb msb)))
+      (java.util.UUID. msb lsb)))
+
+  (write [bt buffer idx value]
+    (.setLong buffer idx       (.getMostSignificantBits value))
+    (.setLong buffer (+ 8 idx) (.getLeastSignificantBits value)))
 
   (rewind-write [bt buffer value]
     (.writeLong buffer (.getMostSignificantBits value))
     (.writeLong buffer (.getLeastSignificantBits value)))
 
-  (write [bt buffer idx value]
-    (.setLong buffer idx       (.getMostSignificantBits value))
-    (.setLong buffer (+ 8 idx) (.getLeastSignificantBits value)))
+  (rewind-read [by buffer]
+    (let [msb (.readLong buffer)
+          lsb (.readLong buffer)]
+      (java.util.UUID. msb lsb)))
 
   Object
   (toString [_]
