@@ -23,4 +23,4 @@
                                        :snapshots true
                                        :releases {:checksum :fail :update :always}}}
 
-  :aliases      {"all" ["with-profile" "dev:dev,1.5:dev,1.7:dev:dev,master"]})
+  :aliases      {"all" ["with-profile" "dev:dev,1.7:dev"]})
