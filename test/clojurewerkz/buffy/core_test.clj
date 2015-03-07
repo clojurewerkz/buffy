@@ -116,7 +116,6 @@
         b    (compose-buffer s)
         uuid (java.util.UUID/randomUUID)]
     (set-field b :first-field uuid)
-    (println uuid (get-field b :first-field))
     (is (= uuid (get-field b :first-field)))))
 
 (defmacro get-set-generative
