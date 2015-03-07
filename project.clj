@@ -9,8 +9,7 @@
                  [io.netty/netty-buffer   "4.0.26.Final"]
                  [org.clojure/test.check  "0.6.2"]]
 
-  :profiles     {:1.5    {:dependencies [[org.clojure/clojure "1.5.1"]]}
-                 :1.7    {:dependencies [[org.clojure/clojure "1.7.0-alpha5"]]}
+  :profiles     {:1.7    {:dependencies [[org.clojure/clojure "1.7.0-alpha5"]]}
                  :master {:dependencies [[org.clojure/clojure "1.7.0-master-SNAPSHOT"]]}
                  :dev    {:resource-paths ["test/resources"]
                           :plugins [[codox "0.8.10"]]
