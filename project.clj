@@ -1,4 +1,4 @@
-(defproject clojurewerkz/buffy "1.1.0-SNAPSHOT"
+(defproject clojurewerkz/buffy "1.0.1"
   :description  "Clojure library for working with binary data"
   :url          "http://github.com/clojurewerkz/buffy"
 
