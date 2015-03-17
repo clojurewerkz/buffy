@@ -1,4 +1,4 @@
-(defproject clojurewerkz/buffy "1.0.1"
+(defproject clojurewerkz/buffy "1.1.0-SNAPSHOT"
   :description  "Clojure library for working with binary data"
   :url          "http://github.com/clojurewerkz/buffy"
 
@@ -8,6 +8,10 @@
   :dependencies [[org.clojure/clojure     "1.6.0"]
                  [io.netty/netty-buffer   "4.0.26.Final"]
                  [org.clojure/test.check  "0.6.2"]]
+
+;  :jvm-opts     ["-noverify"
+;                 "-javaagent:/Users/ifesdjeen/hackage/introspect/target/introspect-1.0.0-SNAPSHOT-standalone.jar=clojurewerkz.buffy.core"
+;]
 
   :profiles     {:1.7    {:dependencies [[org.clojure/clojure "1.7.0-alpha5"]]}
                  :master {:dependencies [[org.clojure/clojure "1.7.0-master-SNAPSHOT"]]}
