@@ -7,7 +7,7 @@ everything you would usually do with `ByteBuffer`.
 
 ## Main features
 
-  * partial deserialization (read and deserialise parts of a byte buffer)
+  * partial deserialization (read and deserialize parts of a byte buffer)
   * named access (access parts of your buffer by names)
   * composing/decomposing from key/value pairs
   * pretty hexdump
@@ -70,7 +70,7 @@ one or more fields of known data types, for example:
       :my-field-2 (string-type 10))
 ```
 
-The spec can be a map (e.g. `array-map`) or avector of vectors.
+The spec can be a map (e.g. `array-map`) or a vector of vectors.
 Avoid using hash maps, since they are unordered.
 
 Below is a specification for a buffer containing 2 fields, one 4 bytes
@@ -220,7 +220,7 @@ Also, `on-bits-indexes` that returns positions at which bits are set, and
 `off-bits-indexes` that returns positions at which bits are cleared.
 
 In order to use bit type, you need to give it a 32-items long sequence of
-truthy or fasly falues:
+truthy or falsy falues:
 
 ```clojure
 (let [s (spec :first-field (bit-type 4) ;; Bit field that fills 4 bytes
@@ -251,8 +251,8 @@ Here's what composite type consisting of `int` and 10 characters long
 (composite-type (int32-type) (string-type 10))
 ```
 
-`repeated-type` repeats a type one or more times.  Repeated types is
-used when you need to have many fields of same size:
+`repeated-type` repeats a type one or more times.  Repeated types are
+used when you need to have many fields of the same size:
 
 ```clojure
 (repeated-type (string-type 10) 5)
@@ -325,7 +325,7 @@ And for wrapped buffer (that wraps the given byte array,
 
 If you're working with sophisticated protocols, more often than not you can't know
 the buffer size before you construct an entire type. One of the most primitive examples
-is `netstrings` protocol, that consists of
+is the `netstrings` protocol, that consists of
 
 ```clojure
 (short-type) ;; Identifies the length of string
@@ -383,7 +383,7 @@ An entire frame would look as follows:
 
 `second` here is just a value formatter. When we read off the value from the buffer, we see the
 `short` as well as `string`, but it's just a helper for correct decomposition, therefore
-we should discard it and take only second value, which is a string itself.
+we should discard it and take only the second value, which is a string itself.
 
 In order to compose/decompose it, you should use `compose` and `decompose` functions:
 
@@ -392,10 +392,10 @@ In order to compose/decompose it, you should use `compose` and `decompose` funct
 ```
 
 This one will return a buffer. Same with `decompose`, that receives dynamic buffer and a value,
-and returns deserialised value.
+and returns deserialized value.
 
 You can go ahead and create even more complicated patterns. For example, you can construct
-a map of strings (as in Cassandra binary CQL protocol), where map is specified by
+a map of strings (as in Cassandra binary CQL protocol), where the map is specified by
 
 ```
 <short>|(repeated <string>|<string>)
