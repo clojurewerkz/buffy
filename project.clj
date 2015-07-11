@@ -13,7 +13,7 @@
 ;                 "-javaagent:/Users/ifesdjeen/hackage/introspect/target/introspect-1.0.0-SNAPSHOT-standalone.jar=clojurewerkz.buffy.core"
 ;]
 
-  :profiles     {:1.7    {:dependencies [[org.clojure/clojure "1.7.0-RC2"]]}
+  :profiles     {:1.7    {:dependencies [[org.clojure/clojure "1.7.0"]]}
                  :master {:dependencies [[org.clojure/clojure "1.7.0-master-SNAPSHOT"]]}
                  :dev    {:resource-paths ["test/resources"]
                           :plugins [[codox "0.8.10"]]
