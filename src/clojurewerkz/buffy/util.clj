@@ -86,7 +86,7 @@
        (map to-ascii)
        j
        (partition-all 16)
-       (map #(format "%16s" (j %)))))
+       (map #(format "%-16s" (j %)))))
 
 (defn- format-hexdump
   "Formats hexsump"
@@ -104,7 +104,8 @@
                                              (= 0 (mod i 2))        " "
                                              :else                  ""))))
                    flatten
-                   j)))))
+                   j
+                   (format "%-48s"))))))
 
 (def header1   "            +--------------------------------------------------+\n")
 (def header2   "            | 0  1  2  3  4  5  6  7   8  9  a  b  c  d  e  f  |\n")
