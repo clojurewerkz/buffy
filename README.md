@@ -133,9 +133,9 @@ You can also serialize and deserialize a complete buffer:
                   :third-field (boolean-type))
       buf  (compose-buffer spec)]
 
-  (set-fields buf {:first-field 101
-                   :second-field "string"
-                   :third-field true})
+  (compose buf {:first-field 101
+                :second-field "string"
+                :third-field true})
 
   (decompose buf)
   ;; => {:third-field true :second-field "string" :first-field 101}
