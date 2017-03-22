@@ -75,6 +75,23 @@
   (toString [_]
     "ByteType"))
 
+(deftype UnsignedByteType []
+  BuffyType
+  (size [_] 1)
+  (write [bt buffer idx value]
+    (.setByte buffer idx (bit-and 0xFF (short value))))
+  (read [by buffer idx]
+    (.getUnsignedByte buffer idx))
+
+  (rewind-write [bt buffer value]
+    (.writeByte buffer (bit-and 0xFF (short value))))
+  (rewind-read [by buffer]
+    (.readUnsignedByte buffer))
+
+  Object
+  (toString [_]
+    "UnsignedByteType"))
+
 (deftype ShortType []
   BuffyType
   (size [_] 2)
@@ -92,6 +109,23 @@
   (toString [_]
     "ShortType"))
 
+(deftype UnsignedShortType []
+  BuffyType
+  (size [_] 2)
+  (write [bt buffer idx value]
+    (.setShort buffer idx (bit-and 0xFFFF (int value))))
+  (read [by buffer idx]
+    (.getUnsignedShort buffer idx))
+
+  (rewind-write [bt buffer value]
+    (.writeShort buffer (bit-and 0xFFFF (int value))))
+  (rewind-read [by buffer]
+    (.readUnsignedShort buffer))
+
+  Object
+  (toString [_]
+    "UnsignedShortType"))
+
 (deftype MediumType []
   BuffyType
   (size [_] 3)
@@ -108,6 +142,40 @@
   Object
   (toString [_]
     "MediumType"))
+
+(deftype UnsignedMediumType []
+  BuffyType
+  (size [_] 3)
+  (write [bt buffer idx value]
+    (.setMedium buffer idx (bit-and 0xFFFFFF (int value))))
+  (read [by buffer idx]
+    (.getUnsignedMedium buffer idx))
+
+  (rewind-write [bt buffer value]
+    (.writeMedium buffer (bit-and 0xFFFFFF (int value))))
+  (rewind-read [by buffer]
+    (.readUnsignedMedium buffer))
+
+  Object
+  (toString [_]
+    "UnsignedMediumType"))
+
+(deftype UnsignedInt32Type []
+  BuffyType
+  (size [_] 4)
+  (write [bt buffer idx value]
+    (.setInt buffer idx (bit-and 0xFFFFFFFF (long value))))
+  (read [by buffer idx]
+    (.getUnsignedInt buffer idx))
+
+  (rewind-write [bt buffer value]
+    (.writeInt buffer (bit-and 0xFFFFFFFF (long value))))
+  (rewind-read [by buffer]
+    (.readUnsignedInt buffer))
+
+  Object
+  (toString [_]
+    "UnsignedInt32Type"))
 
 (deftype BitType [byte-length]
   BuffyType
@@ -248,6 +316,25 @@
   Object
   (toString [_]
     "LongType"))
+
+(deftype UnsignedLongType []
+  BuffyType
+  (size [_] 8)
+  (write [bt buffer idx value]
+    (.setLong buffer idx (.longValue (bigint value))))
+  (read [by buffer idx]
+    (let [buf (byte-array 8)]
+      (.getBytes buffer idx buf)
+      (bigint (.and (new java.math.BigInteger buf) (.toBigInteger 18446744073709551615N)))))
+
+  (rewind-write [bt buffer value]
+    (.writeLong buffer value))
+  (rewind-read [by buffer]
+    (.readLong buffer))
+
+  Object
+  (toString [_]
+    "UnsignedLongType"))
 
 (deftype BytesType [size]
   BuffyType
@@ -397,14 +484,18 @@
 
 (def bit-type     (memoize (fn [length] (BitType. length))))
 (def int32-type   (memoize #(Int32Type.)))
+(def uint32-type  (memoize #(UnsignedInt32Type.)))
 (def boolean-type (memoize #(BooleanType.)))
 (def byte-type    (memoize #(ByteType.)))
+(def ubyte-type   (memoize #(UnsignedByteType.)))
 (def short-type   (memoize #(ShortType.)))
+(def ushort-type  (memoize #(UnsignedShortType.)))
 (def medium-type  (memoize #(MediumType.)))
-;; TODO: Add unsigned types: byte, int, medium, short
+(def umedium-type (memoize #(UnsignedMediumType.)))
 (def float-type   (memoize #(FloatType.)))
 (def double-type  (memoize #(DoubleType.)))
 (def long-type    (memoize #(LongType.)))
+(def ulong-type   (memoize #(UnsignedLongType.)))
 (def string-type  (memoize (fn [length] (StringType. length))))
 (def bytes-type   (memoize (fn [length] (BytesType. length))))
 (def uuid-type    (memoize #(UUIDType.)))
