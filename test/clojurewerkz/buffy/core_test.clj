@@ -54,6 +54,19 @@
     (set-field b :first-field 50)
     (is (= 50 (get-field b :first-field)))))
 
+(deftest unsigned-byte-field-write-test
+  (let [s (spec :first-field (ubyte-type)
+                :second-field (string-type 10))
+        b (compose-buffer s)]
+    (set-field b :first-field 0)
+    (is (= 0 (get-field b :first-field)))
+
+    (set-field b :first-field 50)
+    (is (= 50 (get-field b :first-field)))
+
+    (set-field b :first-field 127)
+    (is (= 127 (get-field b :first-field)))))
+
 (deftest short-field-write-test
   (let [s (spec :first-field (short-type)
                 :second-field (string-type 10))
@@ -66,6 +79,19 @@
 
     (set-field b :first-field (- Short/MAX_VALUE))
     (is (= (- Short/MAX_VALUE) (get-field b :first-field)))))
+
+(deftest unsigned-short-field-write-test
+  (let [s (spec :first-field (ushort-type)
+                :second-field (string-type 10))
+        b (compose-buffer s)]
+    (set-field b :first-field 10)
+    (is (= 10 (get-field b :first-field)))
+
+    (set-field b :first-field Short/MAX_VALUE)
+    (is (= Short/MAX_VALUE (get-field b :first-field)))
+
+    (set-field b :first-field 0x8001)
+    (is (= (+ Short/MAX_VALUE 2) (get-field b :first-field)))))
 
 (deftest medium-field-write-test
   (let [s (spec :first-field (medium-type)
@@ -80,6 +106,36 @@
     (set-field b :first-field (- 8388607))
     (is (= (- 8388607) (get-field b :first-field)))))
 
+(deftest unsigned-medium-field-write-test
+  (let [s (spec :first-field (umedium-type)
+                :second-field (string-type 10))
+        b    (compose-buffer s)]
+    (set-field b :first-field 10)
+    (is (= 10 (get-field b :first-field)))
+
+    (set-field b :first-field 8388607)
+    (is (= 8388607 (get-field b :first-field)))
+
+    (set-field b :first-field 0x800001)
+    (is (= 8388609 (get-field b :first-field)))))
+
+(deftest uint-field-write-test
+  (let [s (spec :first-field (uint32-type)
+                :second-field (string-type 10))
+        b (compose-buffer s)]
+    (set-field b :first-field 101)
+    (is (= 101 (get-field b :first-field)))
+
+    (set-field b :first-field Integer/MAX_VALUE)
+    (is (= Integer/MAX_VALUE (get-field b :first-field)))
+
+    (set-field b :first-field 0x80000001)
+    (is (= (+ Integer/MAX_VALUE 2) (get-field b :first-field)))
+
+    (set-field b :first-field -1)
+    (is (= (long 0xFFFFFFFF) (get-field b :first-field)))))
+
+
 (deftest float-field-write-test
   (let [s (spec :first-field (float-type)
                 :second-field (string-type 10))
@@ -87,7 +143,31 @@
     (set-field b :first-field (float 5.34))
     (is (= (float 5.34) (get-field b :first-field)))))
 
+(deftest long-field-write-test
+  (let [s (spec :first-field (long-type)
+                :second-field (string-type 10))
+        b (compose-buffer s)]
+    (set-field b :first-field 101)
+    (is (= 101 (get-field b :first-field)))
 
+    (set-field b :first-field Long/MAX_VALUE)
+    (is (= Long/MAX_VALUE (get-field b :first-field)))
+
+    (set-field b :first-field (- Long/MAX_VALUE))
+    (is (= (- Long/MAX_VALUE) (get-field b :first-field)))))
+
+(deftest unsigned-long-field-write-test
+  (let [s (spec :first-field (ulong-type)
+                :second-field (string-type 10))
+        b (compose-buffer s)]
+    (set-field b :first-field 101)
+    (is (= 101 (get-field b :first-field)))
+
+    (set-field b :first-field Long/MAX_VALUE)
+    (is (= Long/MAX_VALUE (get-field b :first-field)))
+
+    (set-field b :first-field 18446744073709551615N)
+    (is (= 18446744073709551615N (get-field b :first-field)))))
 
 (deftest string-field-write-test
   (let [s (spec :first-field (int32-type)
@@ -424,10 +504,14 @@
 (deftest rewinding-write-read-tests
   (testing "Rewind-read and write ints"
     (doseq [[type samples] {(int32-type)     [100 1001 10001]
+                            (uint32-type)    [100 1001 10001]
                             (boolean-type)   [true, false]
                             (byte-type)      [10 11 12]
+                            (ubyte-type)     [10 11 12 69]
                             (short-type)     [100 1001 10001]
+                            (ushort-type)    [100 1001 10001]
                             (long-type)      [100 1001 10001]
+                            (ulong-type)     [100 1001 10001]
                             (medium-type)    [100 1001 10001]
                             (float-type)     [100.0 1001.0 10001.0]
                             (double-type)    [100.0 1001.0 10001.0]
