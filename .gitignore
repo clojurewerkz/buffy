@@ -19,3 +19,4 @@ todo*
 \#*
 deploy.docs.sh
 .nrepl-port
+.lein-repl-history
