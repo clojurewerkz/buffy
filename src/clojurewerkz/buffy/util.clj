@@ -15,7 +15,7 @@
 (ns clojurewerkz.buffy.util
   (:refer-clojure :exclude [read])
   (:require [clojurewerkz.buffy.types.protocols :refer :all])
-  (:import [io.netty.buffer ByteBufUtil]))
+  (:import [io.netty.buffer ByteBuf ByteBufUtil]))
 
 (defn positions
   "Returns a lazy sequence containing positions of elements"
@@ -28,28 +28,28 @@
 (defn zero-fill-till-end
   ([buffer size expected-size]
      (when (< size expected-size)
-       (.writeZero buffer (- expected-size size))))
+       (.writeZero ^ByteBuf buffer ^int (- expected-size size))))
   ([buffer idx size expected-size]
      (when (< size expected-size)
-       (.setZero buffer (+ idx size) (- expected-size size)))))
+       (.setZero ^ByteBuf buffer (+ idx size) ^int (- expected-size size)))))
 
 (defn read-nonempty-bytes
-  ([buffer size]
-     (read-nonempty-bytes buffer (.readerIndex buffer) size true))
-  ([buffer idx size]
+  (^bytes [buffer size]
+     (read-nonempty-bytes buffer (.readerIndex ^ByteBuf buffer) size true))
+  (^bytes [buffer idx size]
      (read-nonempty-bytes buffer idx size false))
-  ([buffer idx size rewind?]
+  (^bytes [buffer idx size rewind?]
      (let [first-non-empty (or
                             (->> (range idx (+ idx size))
                                  reverse
-                                 (filter #(not (= 0 (.getByte buffer %))))
+                                 (filter #(not (= 0 (.getByte ^ByteBuf buffer %))))
                                  first)
                             -1)]
        (if (>= first-non-empty 0)
          (let [ba (byte-array (- (inc first-non-empty) idx))]
-           (.getBytes buffer idx ba)
+           (.getBytes ^ByteBuf buffer ^int idx ba)
            (when rewind?
-             (.readerIndex buffer (+ idx size)))
+             (.readerIndex ^ByteBuf buffer (+ idx size)))
            ba)
          (byte-array 0)))))
 
@@ -114,7 +114,7 @@
 
 (defn hex-dump
   "Prints a hex representation of "
-  [b & {:keys [print] :or {print true}}]
+  [^ByteBuf b & {:keys [print] :or {print true}}]
   (let [total        (.capacity b)
         total-padded (* 32 (inc (quot total 32)))
         bytes        (byte-array total-padded)

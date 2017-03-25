@@ -119,7 +119,7 @@
     (set-field b :first-field 0x800001)
     (is (= 8388609 (get-field b :first-field)))))
 
-(deftest uint-field-write-test
+(deftest unsigned-int-field-write-test
   (let [s (spec :first-field (uint32-type)
                 :second-field (string-type 10))
         b (compose-buffer s)]

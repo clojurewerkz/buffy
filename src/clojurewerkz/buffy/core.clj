@@ -18,24 +18,25 @@
             [clojurewerkz.buffy.frames          :refer :all]
             [clojurewerkz.buffy.util            :refer :all]
             [clojurewerkz.buffy.types.protocols :refer :all])
-  (:import [io.netty.buffer Unpooled UnpooledByteBufAllocator ByteBufAllocator]))
+  (:import [io.netty.buffer ByteBuf ByteBufAllocator Unpooled
+            UnpooledByteBufAllocator]))
 
 (def ^ByteBufAllocator allocator UnpooledByteBufAllocator/DEFAULT)
 
 (defn reset-writer-index
-  [buf]
+  [^ByteBuf buf]
   (.resetWriterIndex buf)
   buf)
 
 (defn reset-reader-index
-  [buf]
+  [^ByteBuf buf]
   (.resetReaderIndex buf)
   buf)
 
 (def reset-indexes (comp reset-reader-index reset-writer-index))
 
 (defn rewind-until-end
-  [buf]
+  [^ByteBuf buf]
   (.writerIndex buf (.capacity buf))
   buf)
 
