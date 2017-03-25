@@ -7,7 +7,8 @@
 
   :dependencies [[org.clojure/clojure     "1.6.0"]
                  [io.netty/netty-buffer   "4.0.26.Final"]
-                 [org.clojure/test.check  "0.6.2"]]
+                 [org.clojure/test.check  "0.6.2"]
+                 [criterium "0.4.4"]]
 
 ;  :jvm-opts     ["-noverify"
 ;                 "-javaagent:/Users/ifesdjeen/hackage/introspect/target/introspect-1.0.0-SNAPSHOT-standalone.jar=clojurewerkz.buffy.core"
@@ -26,5 +27,7 @@
                  "sonatype-snapshots" {:url "http://oss.sonatype.org/content/repositories/snapshots"
                                        :snapshots true
                                        :releases {:checksum :fail :update :always}}}
+
+  :global-vars {*warn-on-reflection* true}
 
   :aliases      {"all" ["with-profile" "dev:dev,1.7:dev"]})
