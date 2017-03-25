@@ -16,7 +16,7 @@
   (:refer-clojure :exclude [read])
   (:require [clojurewerkz.buffy.util :refer :all]
             [clojurewerkz.buffy.types.protocols :refer :all])
-  (:import [io.netty.buffer UnpooledByteBufAllocator ByteBufAllocator]))
+  (:import [io.netty.buffer ByteBuf UnpooledByteBufAllocator ByteBufAllocator]))
 
 ;;
 ;; Primitive types
@@ -27,14 +27,14 @@
   BuffyType
   (size [_] 4)
   (write [bt buffer idx value]
-    (.setInt buffer idx value))
+    (.setInt ^ByteBuf buffer idx value))
   (read [by buffer idx]
-    (.getInt buffer idx))
+    (.getInt ^ByteBuf buffer idx))
 
   (rewind-write [bt buffer value]
-    (.writeInt buffer value))
+    (.writeInt ^ByteBuf buffer value))
   (rewind-read [by buffer]
-    (.readInt buffer))
+    (.readInt ^ByteBuf buffer))
 
   Object
   (toString [_]
@@ -44,14 +44,14 @@
   BuffyType
   (size [_] 1)
   (write [bt buffer idx value]
-    (.setBoolean buffer idx value))
+    (.setBoolean ^ByteBuf buffer idx value))
   (read [by buffer idx]
-    (.getBoolean buffer idx))
+    (.getBoolean ^ByteBuf buffer idx))
 
   (rewind-write [bt buffer value]
-    (.writeBoolean buffer value))
+    (.writeBoolean ^ByteBuf buffer value))
   (rewind-read [by buffer]
-    (.readBoolean buffer))
+    (.readBoolean ^ByteBuf buffer))
 
 
   Object
@@ -62,14 +62,14 @@
   BuffyType
   (size [_] 1)
   (write [bt buffer idx value]
-    (.setByte buffer idx value))
+    (.setByte ^ByteBuf buffer ^ByteBuf idx value))
   (read [by buffer idx]
-    (.getByte buffer idx))
+    (.getByte ^ByteBuf buffer idx))
 
   (rewind-write [bt buffer value]
-    (.writeByte buffer value))
+    (.writeByte ^ByteBuf buffer value))
   (rewind-read [by buffer]
-    (.readByte buffer))
+    (.readByte ^ByteBuf buffer))
 
   Object
   (toString [_]
@@ -79,14 +79,14 @@
   BuffyType
   (size [_] 1)
   (write [bt buffer idx value]
-    (.setByte buffer idx (bit-and 0xFF (short value))))
+    (.setByte ^ByteBuf buffer idx (bit-and 0xFF (short value))))
   (read [by buffer idx]
-    (.getUnsignedByte buffer idx))
+    (.getUnsignedByte ^ByteBuf buffer idx))
 
   (rewind-write [bt buffer value]
-    (.writeByte buffer (bit-and 0xFF (short value))))
+    (.writeByte ^ByteBuf buffer (bit-and 0xFF (short value))))
   (rewind-read [by buffer]
-    (.readUnsignedByte buffer))
+    (.readUnsignedByte ^ByteBuf buffer))
 
   Object
   (toString [_]
@@ -96,14 +96,14 @@
   BuffyType
   (size [_] 2)
   (write [bt buffer idx value]
-    (.setShort buffer idx value))
+    (.setShort ^ByteBuf buffer idx value))
   (read [by buffer idx]
-    (.getShort buffer idx))
+    (.getShort ^ByteBuf buffer idx))
 
   (rewind-write [bt buffer value]
-    (.writeShort buffer value))
+    (.writeShort ^ByteBuf buffer value))
   (rewind-read [by buffer]
-    (.readShort buffer))
+    (.readShort ^ByteBuf buffer))
 
   Object
   (toString [_]
@@ -113,14 +113,14 @@
   BuffyType
   (size [_] 2)
   (write [bt buffer idx value]
-    (.setShort buffer idx (bit-and 0xFFFF (int value))))
+    (.setShort ^ByteBuf buffer idx (bit-and 0xFFFF (int value))))
   (read [by buffer idx]
-    (.getUnsignedShort buffer idx))
+    (.getUnsignedShort ^ByteBuf buffer idx))
 
   (rewind-write [bt buffer value]
-    (.writeShort buffer (bit-and 0xFFFF (int value))))
+    (.writeShort ^ByteBuf buffer (bit-and 0xFFFF (int value))))
   (rewind-read [by buffer]
-    (.readUnsignedShort buffer))
+    (.readUnsignedShort ^ByteBuf buffer))
 
   Object
   (toString [_]
@@ -130,14 +130,14 @@
   BuffyType
   (size [_] 3)
   (write [bt buffer idx value]
-    (.setMedium buffer idx value))
+    (.setMedium ^ByteBuf buffer idx value))
   (read [by buffer idx]
-    (.getMedium buffer idx))
+    (.getMedium ^ByteBuf buffer idx))
 
   (rewind-write [bt buffer value]
-    (.writeMedium buffer value))
+    (.writeMedium ^ByteBuf buffer value))
   (rewind-read [by buffer]
-    (.readMedium buffer))
+    (.readMedium ^ByteBuf buffer))
 
   Object
   (toString [_]
@@ -147,14 +147,14 @@
   BuffyType
   (size [_] 3)
   (write [bt buffer idx value]
-    (.setMedium buffer idx (bit-and 0xFFFFFF (int value))))
+    (.setMedium ^ByteBuf buffer idx (bit-and 0xFFFFFF (int value))))
   (read [by buffer idx]
-    (.getUnsignedMedium buffer idx))
+    (.getUnsignedMedium ^ByteBuf buffer idx))
 
   (rewind-write [bt buffer value]
-    (.writeMedium buffer (bit-and 0xFFFFFF (int value))))
+    (.writeMedium ^ByteBuf buffer (bit-and 0xFFFFFF (int value))))
   (rewind-read [by buffer]
-    (.readUnsignedMedium buffer))
+    (.readUnsignedMedium ^ByteBuf buffer))
 
   Object
   (toString [_]
@@ -164,14 +164,14 @@
   BuffyType
   (size [_] 4)
   (write [bt buffer idx value]
-    (.setInt buffer idx (bit-and 0xFFFFFFFF (long value))))
+    (.setInt ^ByteBuf buffer idx (.intValue (Long. ^long value))))
   (read [by buffer idx]
-    (.getUnsignedInt buffer idx))
+    (.getUnsignedInt ^ByteBuf buffer idx))
 
   (rewind-write [bt buffer value]
-    (.writeInt buffer (bit-and 0xFFFFFFFF (long value))))
+    (.writeInt ^ByteBuf buffer (.intValue (Long. ^long value))))
   (rewind-read [by buffer]
-    (.readUnsignedInt buffer))
+    (.readUnsignedInt ^ByteBuf buffer))
 
   Object
   (toString [_]
@@ -194,12 +194,12 @@
                                 (map vector
                                      (->> value (drop (* 8 byte-index)) (take 8))
                                      (iterate inc 0)))]
-        (.setByte buffer idx changed-val))))
+        (.setByte ^ByteBuf buffer idx changed-val))))
   (read [by buffer idx]
     (mapcat identity
             (for [byte-index (range 0 byte-length)]
               (let [idx         (+ idx (- byte-length 1 byte-index))
-                    current-val (.getByte buffer idx)]
+                    current-val (.getByte ^ByteBuf buffer idx)]
                 (map #(bit-test current-val %) (range 0 8))))))
 
 
@@ -270,14 +270,14 @@
   BuffyType
   (size [_] 4)
   (write [bt buffer idx value]
-    (.setFloat buffer idx value))
+    (.setFloat ^ByteBuf buffer idx value))
   (read [by buffer idx]
-    (.getFloat buffer idx))
+    (.getFloat ^ByteBuf buffer idx))
 
   (rewind-write [bt buffer value]
-    (.writeFloat buffer value))
+    (.writeFloat ^ByteBuf buffer value))
   (rewind-read [by buffer]
-    (.readFloat buffer))
+    (.readFloat ^ByteBuf buffer))
 
   Object
   (toString [_]
@@ -287,14 +287,14 @@
   BuffyType
   (size [_] 8)
   (write [bt buffer idx value]
-    (.setDouble buffer idx value))
+    (.setDouble ^ByteBuf buffer idx value))
   (read [by buffer idx]
-    (.getDouble buffer idx))
+    (.getDouble ^ByteBuf buffer idx))
 
   (rewind-write [bt buffer value]
-    (.writeDouble buffer value))
+    (.writeDouble ^ByteBuf buffer value))
   (rewind-read [by buffer]
-    (.readDouble buffer))
+    (.readDouble ^ByteBuf buffer))
 
   Object
   (toString [_]
@@ -304,14 +304,14 @@
   BuffyType
   (size [_] 8)
   (write [bt buffer idx value]
-    (.setLong buffer idx value))
+    (.setLong ^ByteBuf buffer idx value))
   (read [by buffer idx]
-    (.getLong buffer idx))
+    (.getLong ^ByteBuf buffer idx))
 
   (rewind-write [bt buffer value]
-    (.writeLong buffer value))
+    (.writeLong ^ByteBuf buffer value))
   (rewind-read [by buffer]
-    (.readLong buffer))
+    (.readLong ^ByteBuf buffer))
 
   Object
   (toString [_]
@@ -321,16 +321,16 @@
   BuffyType
   (size [_] 8)
   (write [bt buffer idx value]
-    (.setLong buffer idx (.longValue (bigint value))))
+    (.setLong ^ByteBuf buffer idx (.longValue (bigint value))))
   (read [by buffer idx]
     (let [buf (byte-array 8)]
-      (.getBytes buffer idx buf)
+      (.getBytes ^ByteBuf buffer ^int idx ^bytes buf)
       (bigint (.and (new java.math.BigInteger buf) (.toBigInteger 18446744073709551615N)))))
 
   (rewind-write [bt buffer value]
-    (.writeLong buffer value))
+    (.writeLong ^ByteBuf buffer value))
   (rewind-read [by buffer]
-    (.readLong buffer))
+    (.readLong ^ByteBuf buffer))
 
   Object
   (toString [_]
@@ -340,13 +340,13 @@
   BuffyType
   (size [_] size)
   (write [bt buffer idx value]
-    (.setBytes buffer idx value)
+    (.setBytes ^ByteBuf buffer ^int idx ^bytes value)
     (zero-fill-till-end buffer idx (count value) (.size bt)))
   (read [bt buffer idx]
     (read-nonempty-bytes buffer idx (.size bt)))
 
   (rewind-write [bt buffer value]
-    (.writeBytes buffer value)
+    (.writeBytes ^ByteBuf buffer ^bytes value)
     (zero-fill-till-end buffer (count value) (.size bt)))
   (rewind-read [bt buffer]
     (read-nonempty-bytes buffer (.size bt)))
@@ -360,7 +360,7 @@
   (size [_] size)
   (write [bt buffer idx value]
     ;; TODO assert
-    (.setBytes buffer idx (.getBytes value))
+    (.setBytes ^ByteBuf buffer ^int idx (.getBytes ^String value))
     (zero-fill-till-end buffer idx (count value) size))
   (read [bt buffer idx]
     (String.
@@ -368,7 +368,7 @@
 
   (rewind-write [bt buffer value]
     ;; TODO assert
-    (.writeBytes buffer (.getBytes value))
+    (.writeBytes ^ByteBuf buffer (.getBytes ^String value))
     (zero-fill-till-end buffer (count value) size))
   (rewind-read [bt buffer]
     (String.
