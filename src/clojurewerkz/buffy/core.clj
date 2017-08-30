@@ -59,7 +59,8 @@
 (defn wrapped-buffer
   "Returns a buffer that wraps the given byte array, `j.nio.ByteBuffer` or netty `ByteBuf`"
   [orig-buffer]
-  (rewind-until-end (Unpooled/wrappedBuffer orig-buffer)))
+  (rewind-until-end (.order (Unpooled/wrappedBuffer orig-buffer)
+                            (.order orig-buffer))))
 
 (defprotocol Composable
   (decompose [this] [this buffer])
