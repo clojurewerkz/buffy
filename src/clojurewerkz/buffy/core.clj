@@ -13,7 +13,7 @@
 ;; limitations under the License.
 
 (ns clojurewerkz.buffy.core
-  (:refer-clojure :exclude [read])
+  (:refer-clojure :exclude [read seqable?])
   (:require [clojurewerkz.buffy.types           :as t]
             [clojurewerkz.buffy.frames          :refer :all]
             [clojurewerkz.buffy.util            :refer :all]
