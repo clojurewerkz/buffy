@@ -1,3 +1,13 @@
+## Changes Between 1.1.0 and 1.2.0
+
+### Clojure 1.8.0
+
+This project now depends on Clojure 1.8.0. Older
+versions are still supported but tested on a
+best-effort basis.
+
+
+
 ## Changes Between 1.0.0 and 1.1.0
 
 ### Unsigned Types
