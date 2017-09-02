@@ -143,7 +143,7 @@
            [frame & more] subframes]
       (if (nil? frame)
         size
-        (let [frame-size (decoding-size* frame buffer idx)]
+        (let [^long frame-size (decoding-size* frame buffer idx)]
           (recur (+ size frame-size) (+ idx frame-size) more)))))
 
   Object
