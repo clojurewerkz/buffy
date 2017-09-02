@@ -5,7 +5,7 @@
   :license      {:name "Eclipse Public License"
                  :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [[org.clojure/clojure     "1.6.0"]
+  :dependencies [[org.clojure/clojure     "1.8.0"]
                  [io.netty/netty-buffer   "4.0.26.Final"]
                  [org.clojure/test.check  "0.6.2"]
                  [criterium "0.4.4"]]
@@ -15,7 +15,7 @@
 ;]
 
   :profiles     {:1.7    {:dependencies [[org.clojure/clojure "1.7.0"]]}
-                 :master {:dependencies [[org.clojure/clojure "1.8.0-master-SNAPSHOT"]]}
+                 :master {:dependencies [[org.clojure/clojure "1.9.0-master-SNAPSHOT"]]}
                  :dev    {:resource-paths ["test/resources"]
                           :plugins [[codox "0.8.10"]]
                           :codox {:sources ["src/clojure"]
@@ -30,4 +30,4 @@
 
   :global-vars {*warn-on-reflection* true}
 
-  :aliases      {"all" ["with-profile" "dev:dev,1.7:dev"]})
+  :aliases      {"all" ["with-profile" "dev:dev,1.7:dev,master"]})
