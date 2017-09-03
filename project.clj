@@ -6,7 +6,7 @@
                  :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure     "1.8.0"]
-                 [io.netty/netty-buffer   "4.0.26.Final"]
+                 [io.netty/netty-buffer   "4.0.51.Final"]
                  [org.clojure/test.check  "0.6.2"]
                  [criterium "0.4.4"]]
 
