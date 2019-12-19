@@ -13,16 +13,18 @@
 ;; limitations under the License.
 
 (ns clojurewerkz.buffy.util
-  (:refer-clojure :exclude [read])
-  (:require [clojurewerkz.buffy.types.protocols :refer :all])
+  (:refer-clojure :exclude [seqable?])
+  (:require [clojurewerkz.buffy.types.protocols :as p])
   (:import [io.netty.buffer ByteBuf ByteBufUtil]))
+
+(set! *warn-on-reflection* true)
 
 (defn positions
   "Returns a lazy sequence containing positions of elements"
   [types]
   ((fn rpositions [[t & more] current-pos]
      (when t
-       (cons current-pos (lazy-seq (rpositions more (+ current-pos (size t)))))))
+       (cons current-pos (lazy-seq (rpositions more (+ current-pos (p/size t)))))))
    types 0))
 
 (defn zero-fill-till-end
@@ -139,7 +141,7 @@
       (instance? clojure.lang.Seqable x)
       (nil? x)
       (instance? Iterable x)
-      (-> x .getClass .isArray)
+      (-> x class .isArray)
       (string? x)
       (instance? java.util.Map x)))
 
