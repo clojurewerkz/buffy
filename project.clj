@@ -5,18 +5,20 @@
   :license      {:name "Eclipse Public License"
                  :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [[org.clojure/clojure     "1.8.0"]
-                 [io.netty/netty-buffer   "4.0.51.Final"]
-                 [org.clojure/test.check  "0.6.2"]
-                 [criterium "0.4.4"]]
+  :dependencies [[org.clojure/clojure   "1.10.1"]
+                 [io.netty/netty-buffer "4.0.51.Final"]]
 
 ;  :jvm-opts     ["-noverify"
 ;                 "-javaagent:/Users/ifesdjeen/hackage/introspect/target/introspect-1.0.0-SNAPSHOT-standalone.jar=clojurewerkz.buffy.core"
 ;]
 
   :profiles     {:1.7    {:dependencies [[org.clojure/clojure "1.7.0"]]}
-                 :master {:dependencies [[org.clojure/clojure "1.9.0-master-SNAPSHOT"]]}
-                 :dev    {:resource-paths ["test/resources"]
+                 :1.8    {:dependencies [[org.clojure/clojure "1.8.0"]]}
+                 :1.9    {:dependencies [[org.clojure/clojure "1.9.0"]]}
+                 :master {:dependencies [[org.clojure/clojure "1.11.0-master-SNAPSHOT"]]}
+                 :dev    {:dependencies [[org.clojure/test.check  "0.6.2"]
+                                         [criterium "0.4.4"]]
+                          :resource-paths ["test/resources"]
                           :plugins [[codox "0.8.10"]]
                           :codox {:sources ["src/clojure"]
                                   :output-dir "doc/api"}}}
@@ -30,4 +32,4 @@
 
   :global-vars {*warn-on-reflection* true}
 
-  :aliases      {"all" ["with-profile" "dev:dev,1.7:dev,master"]})
+  :aliases      {"all" ["with-profile" "dev:dev,1.7:dev,1.8:dev,1.9:dev,master"]})
