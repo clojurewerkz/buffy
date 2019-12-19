@@ -13,10 +13,11 @@
 ;; limitations under the License.
 
 (ns clojurewerkz.buffy.frames
-  (:refer-clojure :exclude [read])
-  (:require [clojurewerkz.buffy.types :refer :all]
-            [clojurewerkz.buffy.util :refer :all]
-            [clojurewerkz.buffy.types.protocols :refer :all]))
+  (:require [clojurewerkz.buffy.types :as t]
+            [clojurewerkz.buffy.types.protocols :as p]
+            [clojurewerkz.buffy.util :as util]))
+
+(set! *warn-on-reflection* true)
 
 (declare composite-frame)
 (declare encoding-size*)
@@ -67,34 +68,34 @@
   (decoding-size [this buffer idx]))
 
 (deftype FrameType [encoder decoder value-formatter]
-  BuffyType
+  p/BuffyType
   (size [_] (throw (RuntimeException. "Can't determine size of the frame")))
 
+  (write [bt buffer idx value]
+    (let [[type values] (encoder value)]
+      (p/write type
+               buffer
+               idx
+               values)))
+  (read [by buffer idx]
+    (value-formatter
+     (p/read (decoder buffer idx)
+             buffer
+             idx)))
+
+  Frame
   (encoder-for [this value]
     (encoder value))
 
   (decoder-for [this buffer idx]
     (decoder buffer idx))
 
-  (write [bt buffer idx value]
-    (let [[type values] (encoder value)]
-      (.write type
-              buffer
-              idx
-              values)))
-  (read [by buffer idx]
-    (value-formatter
-     (.read (decoder buffer idx)
-            buffer
-            idx)))
-
-  Frame
   (encoding-size [_ value]
     (->> value
-        encoder
-        (partition 2)
-        (map (fn [[a b]] (encoding-size* a b)))
-        (reduce +)))
+         encoder
+         (partition 2)
+         (map (fn [[a b]] (encoding-size* a b)))
+         (reduce +)))
 
   (decoding-size [_ buffer idx]
     (decoding-size* (decoder buffer idx) buffer idx))
@@ -111,14 +112,14 @@
        (map (fn [[t v]] (encoding-size* t v)))))
 
 (deftype CompositeFrame [subframes]
-  BuffyType
+  p/BuffyType
   (size [_] (throw (RuntimeException. "Can't determine size of composite frame")))
 
   (write [_ buffer idx values]
     (loop [[[frame value] & more] (partition 2 (interleave subframes values))
            [size & more-sizes]    (composite-frame-sizes subframes values)
            idx                    idx]
-      (write frame buffer idx value)
+      (p/write frame buffer idx value)
       (when (not (empty? more))
         (recur more more-sizes (+ idx size))))
     buffer)
@@ -130,7 +131,7 @@
       (if (nil? frame)
         acc
         (let [size  (decoding-size* frame buffer idx)
-              value (read frame buffer idx)]
+              value (p/read frame buffer idx)]
           (recur more (+ idx size) (conj acc value))))))
 
   Frame
@@ -154,13 +155,13 @@
   [frame-or-type value]
   (if (instance? (:on-interface Frame) frame-or-type)
     (encoding-size frame-or-type value)
-    (size frame-or-type)))
+    (p/size frame-or-type)))
 
 (defn decoding-size*
   [frame-or-type buffer idx]
   (if (instance? (:on-interface Frame) frame-or-type)
     (decoding-size frame-or-type buffer idx)
-    (size frame-or-type)))
+    (p/size frame-or-type)))
 
 (defn frame-type
   ([encoder decoder]

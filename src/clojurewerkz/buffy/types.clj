@@ -13,18 +13,19 @@
 ;; limitations under the License.
 
 (ns clojurewerkz.buffy.types
-  (:refer-clojure :exclude [read])
-  (:require [clojurewerkz.buffy.util :refer :all]
-            [clojurewerkz.buffy.types.protocols :refer :all])
-  (:import [io.netty.buffer ByteBuf UnpooledByteBufAllocator ByteBufAllocator]))
+  (:require [clojurewerkz.buffy.util :as util]
+            [clojurewerkz.buffy.types.protocols :as p])
+  (:import [java.util UUID]
+           [io.netty.buffer ByteBuf UnpooledByteBufAllocator ByteBufAllocator]))
+
+(set! *warn-on-reflection* true)
 
 ;;
 ;; Primitive types
 ;;
 
-
 (deftype Int32Type []
-  BuffyType
+  p/BuffyType
   (size [_] 4)
   (write [bt buffer idx value]
     (.setInt ^ByteBuf buffer idx value))
@@ -41,7 +42,7 @@
     "Int32Type"))
 
 (deftype BooleanType []
-  BuffyType
+  p/BuffyType
   (size [_] 1)
   (write [bt buffer idx value]
     (.setBoolean ^ByteBuf buffer idx value))
@@ -59,7 +60,7 @@
     "BooleanType"))
 
 (deftype ByteType []
-  BuffyType
+  p/BuffyType
   (size [_] 1)
   (write [bt buffer idx value]
     (.setByte ^ByteBuf buffer ^ByteBuf idx value))
@@ -76,7 +77,7 @@
     "ByteType"))
 
 (deftype UnsignedByteType []
-  BuffyType
+  p/BuffyType
   (size [_] 1)
   (write [bt buffer idx value]
     (.setByte ^ByteBuf buffer idx (bit-and 0xFF (short value))))
@@ -93,7 +94,7 @@
     "UnsignedByteType"))
 
 (deftype ShortType []
-  BuffyType
+  p/BuffyType
   (size [_] 2)
   (write [bt buffer idx value]
     (.setShort ^ByteBuf buffer idx value))
@@ -110,7 +111,7 @@
     "ShortType"))
 
 (deftype UnsignedShortType []
-  BuffyType
+  p/BuffyType
   (size [_] 2)
   (write [bt buffer idx value]
     (.setShort ^ByteBuf buffer idx (bit-and 0xFFFF (int value))))
@@ -127,7 +128,7 @@
     "UnsignedShortType"))
 
 (deftype MediumType []
-  BuffyType
+  p/BuffyType
   (size [_] 3)
   (write [bt buffer idx value]
     (.setMedium ^ByteBuf buffer idx value))
@@ -144,7 +145,7 @@
     "MediumType"))
 
 (deftype UnsignedMediumType []
-  BuffyType
+  p/BuffyType
   (size [_] 3)
   (write [bt buffer idx value]
     (.setMedium ^ByteBuf buffer idx (bit-and 0xFFFFFF (int value))))
@@ -161,7 +162,7 @@
     "UnsignedMediumType"))
 
 (deftype UnsignedInt32Type []
-  BuffyType
+  p/BuffyType
   (size [_] 4)
   (write [bt buffer idx value]
     (.setInt ^ByteBuf buffer idx (.intValue (Long. ^long value))))
@@ -178,10 +179,10 @@
     "UnsignedInt32Type"))
 
 (deftype BitType [byte-length]
-  BuffyType
+  p/BuffyType
   (size [_] byte-length)
   (write [bt buffer idx value]
-    (assert (seqable? value) "Bit Field value should be collection")
+    (assert (util/seqable? value) "Bit Field value should be collection")
     (assert (= (count value) (* byte-length 8)) (str "Bit Field value should be " (* byte-length 4) " bits long"))
 
     (doseq [byte-index (range 0 byte-length)]
@@ -247,16 +248,16 @@
     fields)))
 
 (deftype BitMapType [inner-bits fields]
-  BuffyType
-  (size [_] (size inner-bits))
+  p/BuffyType
+  (size [_] (p/size inner-bits))
   (write [bt buffer idx value]
     (let [bit-map-value (bit-map-hash-map->long-value value fields)
-          bit-indexes   (reverse (range (* 8 (size inner-bits))))]
-      (write inner-bits buffer idx
-             (mapv #(bit-test bit-map-value %) bit-indexes))))
+          bit-indexes   (reverse (range (* 8 (p/size inner-bits))))]
+      (p/write inner-bits buffer idx
+               (mapv #(bit-test bit-map-value %) bit-indexes))))
 
   (read [by buffer idx]
-    (bit-map-bits->hash-map (read inner-bits buffer idx) fields))
+    (bit-map-bits->hash-map (p/read inner-bits buffer idx) fields))
 
 
   (rewind-write [bt buffer value]
@@ -267,7 +268,7 @@
   )
 
 (deftype FloatType []
-  BuffyType
+  p/BuffyType
   (size [_] 4)
   (write [bt buffer idx value]
     (.setFloat ^ByteBuf buffer idx value))
@@ -284,7 +285,7 @@
     "FloatType"))
 
 (deftype DoubleType []
-  BuffyType
+  p/BuffyType
   (size [_] 8)
   (write [bt buffer idx value]
     (.setDouble ^ByteBuf buffer idx value))
@@ -301,7 +302,7 @@
     "DoubleType"))
 
 (deftype LongType []
-  BuffyType
+  p/BuffyType
   (size [_] 8)
   (write [bt buffer idx value]
     (.setLong ^ByteBuf buffer idx value))
@@ -318,7 +319,7 @@
     "LongType"))
 
 (deftype UnsignedLongType []
-  BuffyType
+  p/BuffyType
   (size [_] 8)
   (write [bt buffer idx value]
     (.setLong ^ByteBuf buffer idx (.longValue (bigint value))))
@@ -337,42 +338,42 @@
     "UnsignedLongType"))
 
 (deftype BytesType [size]
-  BuffyType
+  p/BuffyType
   (size [_] size)
   (write [bt buffer idx value]
     (.setBytes ^ByteBuf buffer ^int idx ^bytes value)
-    (zero-fill-till-end buffer idx (count value) (.size bt)))
+    (util/zero-fill-till-end buffer idx (count value) (p/size bt)))
   (read [bt buffer idx]
-    (read-nonempty-bytes buffer idx (.size bt)))
+    (util/read-nonempty-bytes buffer idx (p/size bt)))
 
   (rewind-write [bt buffer value]
     (.writeBytes ^ByteBuf buffer ^bytes value)
-    (zero-fill-till-end buffer (count value) (.size bt)))
+    (util/zero-fill-till-end buffer (count value) (p/size bt)))
   (rewind-read [bt buffer]
-    (read-nonempty-bytes buffer (.size bt)))
+    (util/read-nonempty-bytes buffer (p/size bt)))
 
   Object
   (toString [_]
     (str "BytesType: (" size ")")))
 
 (deftype StringType [size]
-  BuffyType
+  p/BuffyType
   (size [_] size)
   (write [bt buffer idx value]
     ;; TODO assert
     (.setBytes ^ByteBuf buffer ^int idx (.getBytes ^String value))
-    (zero-fill-till-end buffer idx (count value) size))
+    (util/zero-fill-till-end buffer idx (count value) size))
   (read [bt buffer idx]
     (String.
-     (read-nonempty-bytes buffer idx (.size bt))))
+     (util/read-nonempty-bytes buffer idx (p/size bt))))
 
   (rewind-write [bt buffer value]
     ;; TODO assert
     (.writeBytes ^ByteBuf buffer (.getBytes ^String value))
-    (zero-fill-till-end buffer (count value) size))
+    (util/zero-fill-till-end buffer (count value) size))
   (rewind-read [bt buffer]
     (String.
-     (read-nonempty-bytes buffer (.size bt))))
+     (util/read-nonempty-bytes buffer (p/size bt))))
 
 
   Object
@@ -384,94 +385,94 @@
 ;;
 
 (deftype EnumType [item-type mappings reverse-mappings]
-  BuffyType
-  (size [_] (size item-type))
+  p/BuffyType
+  (size [_] (p/size item-type))
 
   (write [bt buffer idx value]
-    (.write item-type buffer idx (get mappings value)))
+    (p/write item-type buffer idx (get mappings value)))
   (read [bt buffer idx]
-    (let [intermediate (.read item-type buffer idx)]
+    (let [intermediate (p/read item-type buffer idx)]
       (get reverse-mappings intermediate)))
 
   (rewind-write [bt buffer value]
-    (.rewind-write item-type buffer (get mappings value)))
+    (p/rewind-write item-type buffer (get mappings value)))
   (rewind-read [bt buffer]
-    (let [intermediate (.rewind-read item-type buffer)]
+    (let [intermediate (p/rewind-read item-type buffer)]
       (get reverse-mappings intermediate))))
 
 (deftype CompositeType [types]
-  BuffyType
-  (size [_] (reduce + (map #(.size %) types)))
+  p/BuffyType
+  (size [_] (reduce + (map p/size types)))
   (write [bt buffer idx values]
     (assert (= (count types) (count values)) "Number of values passed to composite should equal number of types")
-    (doseq [[type value position] (map vector types values (positions types))]
-      (.write type buffer (+ idx position) value)))
+    (doseq [[type value position] (map vector types values (util/positions types))]
+      (p/write type buffer (+ idx position) value)))
   (read [bt buffer idx]
     (into []
-          (for [[type position] (map vector types (positions types))]
-            (.read type buffer (+ idx position)))))
+          (for [[type position] (map vector types (util/positions types))]
+            (p/read type buffer (+ idx position)))))
 
   (rewind-write [bt buffer values]
     (assert (= (count types) (count values)) "Number of values passed to composite should equal number of types")
     (doseq [[type value] (map vector types values)]
-      (.rewind-write type buffer value)))
+      (p/rewind-write type buffer value)))
   (rewind-read [bt buffer]
     (into []
           (for [type types]
-            (.rewind-read type buffer))))
+            (p/rewind-read type buffer))))
 
   Object
   (toString [_]
     (str "CompositeType: (" (clojure.string/join ", " (mapv str types)) ")")))
 
 (deftype RepeatedType [type times]
-  BuffyType
-  (size [_] (* (.size type) times))
+  p/BuffyType
+  (size [_] (* (p/size type) times))
 
   (write [bt buffer idx values]
-    (doseq [[value position] (map vector values (positions (repeat (count values) type)))]
-      (.write type buffer (+ idx position) value))
+    (doseq [[value position] (map vector values (util/positions (repeat (count values) type)))]
+      (p/write type buffer (+ idx position) value))
     ;; buffer idx size expected-size
-    (zero-fill-till-end buffer idx (dec (* (.size type) (-> values count inc))) (.size bt)))
+    (util/zero-fill-till-end buffer idx (dec (* (p/size type) (-> values count inc))) (p/size bt)))
 
   (read [bt buffer idx]
     (into []
-          (for [position (positions (repeat times type))]
-            (.read type buffer (+ idx position)))))
+          (for [position (util/positions (repeat times type))]
+            (p/read type buffer (+ idx position)))))
 
 
   (rewind-write [bt buffer values]
     (doseq [value values]
-      (.rewind-write type buffer value))
+      (p/rewind-write type buffer value))
     ;; buffer idx size expected-size
-    (zero-fill-till-end buffer (dec (* (.size type) (-> values count inc))) (.size bt)))
+    (util/zero-fill-till-end buffer (dec (* (p/size type) (-> values count inc))) (p/size bt)))
 
   (rewind-read [bt buffer]
     (into []
           (for [idx (range times)]
-            (.rewind-read type buffer)))))
+            (p/rewind-read type buffer)))))
 
 (deftype UUIDType []
-  BuffyType
+  p/BuffyType
   (size [_] 16)
 
   (read [by buffer idx]
-    (let [msb (.getLong buffer idx)
-          lsb (.getLong buffer (+ idx 8))]
-      (java.util.UUID. msb lsb)))
+    (let [msb (.getLong ^ByteBuf buffer idx)
+          lsb (.getLong ^ByteBuf buffer (+ idx 8))]
+      (UUID. msb lsb)))
 
   (write [bt buffer idx value]
-    (.setLong buffer idx       (.getMostSignificantBits value))
-    (.setLong buffer (+ 8 idx) (.getLeastSignificantBits value)))
+    (.setLong ^ByteBuf buffer idx       (.getMostSignificantBits ^UUID value))
+    (.setLong ^ByteBuf buffer (+ 8 idx) (.getLeastSignificantBits ^UUID value)))
 
   (rewind-write [bt buffer value]
-    (.writeLong buffer (.getMostSignificantBits value))
-    (.writeLong buffer (.getLeastSignificantBits value)))
+    (.writeLong ^ByteBuf buffer (.getMostSignificantBits ^UUID value))
+    (.writeLong ^ByteBuf buffer (.getLeastSignificantBits ^UUID value)))
 
   (rewind-read [by buffer]
-    (let [msb (.readLong buffer)
-          lsb (.readLong buffer)]
-      (java.util.UUID. msb lsb)))
+    (let [msb (.readLong ^ByteBuf buffer)
+          lsb (.readLong ^ByteBuf buffer)]
+      (UUID. msb lsb)))
 
   Object
   (toString [_]
