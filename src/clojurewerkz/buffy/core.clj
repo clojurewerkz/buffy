@@ -58,11 +58,23 @@
   ([^long initial-capacity ^long max-capacity]
    (rewind-until-end (.directBuffer allocator initial-capacity max-capacity))))
 
-(defn wrapped-buffer
-  "Returns a buffer that wraps the given byte array, `j.nio.ByteBuffer` or netty `ByteBuf`"
-  [orig-buffer]
-  (rewind-until-end (.order (Unpooled/wrappedBuffer orig-buffer)
-                            (.order orig-buffer))))
+(defprotocol Wrappable
+  (wrapped-buffer [this] "Returns a buffer that wraps the given byte array, `j.nio.ByteBuffer` or netty `ByteBuf`"))
+
+(extend-protocol Wrappable
+  (Class/forName "[B")
+  (wrapped-buffer [this]
+    (rewind-until-end (Unpooled/wrappedBuffer ^bytes this)))
+
+  ByteBuffer
+  (wrapped-buffer [this]
+    (rewind-until-end (.order (Unpooled/wrappedBuffer this)
+                              (.order this))))
+
+  ByteBuf
+  (wrapped-buffer [this]
+    (rewind-until-end (.order (Unpooled/wrappedBuffer this)
+                              (.order this)))))
 
 (defprotocol Composable
   (decompose [this] [this buffer])
